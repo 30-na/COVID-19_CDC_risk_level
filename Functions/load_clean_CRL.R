@@ -26,7 +26,7 @@ CDC_risk_clean = CDC_risk %>%
     arrange(date, state, county) %>%
     filter(date >= "2021/01/01")
 
-save(CDC.risk.clean, file="Data/CDC_risk_level.csv") 
+save(CDC_risk_clean, file="Data/CDC_risk_level.csv") 
 
 
 
