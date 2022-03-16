@@ -9,6 +9,7 @@ Datasets:
 2. [CDC COVID-19 Vaccinations in the United States,County](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh)  
 
 3. [COVID-19: Stringency Index](https://ourworldindata.org/covid-stringency-index#:~:text=The%20nine%20metrics%20used%20to,movements%3B%20and%20international%20travel%20controls)  
+4. [United States COVID-19 County Level of Community Transmission as Originally Posted](https://data.cdc.gov/Public-Health-Surveillance/United-States-COVID-19-County-Level-of-Community-T/8396-v7yb)
 
 
 -----------
