@@ -11,7 +11,7 @@ Datasets:
 3. [COVID-19: Stringency Index](https://ourworldindata.org/covid-stringency-index#:~:text=The%20nine%20metrics%20used%20to,movements%3B%20and%20international%20travel%20controls)  
 4. [United States COVID-19 County Level of Community Transmission as Originally Posted](https://data.cdc.gov/Public-Health-Surveillance/United-States-COVID-19-County-Level-of-Community-T/8396-v7yb)
 5. [COVID-19 Reported Patient Impact and Hospital Capacity by Facility](https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/anag-cw7u)
-
+6. [United States COVID-19 Community Levels by County as Originally Posted](https://data.cdc.gov/Public-Health-Surveillance/United-States-COVID-19-Community-Levels-by-County-/3nnm-4jni)
 -----------
 Features:
 
