@@ -104,7 +104,7 @@ alldata = merge(joined_vaccine_risk,
                 all=TRUE) %>%
   arrange(date, state, county)
 
+stringency.inedx = fread("Data/covid-stringency-index.csv")
 
-#  
 
 save(alldata, file="Data/alldata.csv")
