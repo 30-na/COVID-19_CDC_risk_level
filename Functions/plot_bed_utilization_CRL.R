@@ -6,11 +6,7 @@ library(scales)
 
 load("Data/CDC_risk_level_new.csv")
 
-
-df = na.omit(CDC_risk_clean_new)
-df$risk_level = as.factor(df$risk_level)
-
-fig7 = ggplot(df, aes(x=risk_level,y=bed_utilization, color=risk_level))+
+fig7 = ggplot(na.omit(CDC_risk_clean_new), aes(x=risk_level,y=bed_utilization, color=risk_level))+
     geom_jitter(position = position_jitter(width = 0.02))+
     geom_boxplot(alpha = 0.7)+
     coord_flip()+
