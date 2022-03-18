@@ -26,6 +26,8 @@ CDC_risk_clean_new = CDC_risk_new %>%
     arrange(date_updated, state, county_fips) %>%
     filter(date_updated >= "2021/01/01")
 
+
+CDC_risk_clean_new$bed_utilization = as.numeric(gsub("%", "", CDC_risk_clean_new$bed_utilization))
 #CDC_risk_clean_new$county = gsub(" County.*", "", CDC_risk_clean_new$county)
 #CDC_risk_clean_new$county = gsub(",.*", "", CDC_risk_clean_new$county)
 
