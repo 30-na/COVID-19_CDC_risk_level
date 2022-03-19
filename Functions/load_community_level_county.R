@@ -7,7 +7,7 @@ library(data.table)
 CDC_risk_new = fread("Data/United_States_COVID-19_Community_Levels_by_County_as_Originally_Posted.csv")
 
 #clean data
-CDC_risk_clean_new = CDC_risk_new %>%
+CDC_community_level_county = CDC_risk_new %>%
     select(c(date_updated,
            state,
            county_fips,
@@ -31,7 +31,7 @@ CDC_risk_clean_new$bed_utilization = as.numeric(gsub("%", "", CDC_risk_clean_new
 #CDC_risk_clean_new$county = gsub(" County.*", "", CDC_risk_clean_new$county)
 #CDC_risk_clean_new$county = gsub(",.*", "", CDC_risk_clean_new$county)
 
-save(CDC_risk_clean_new, file="Data/CDC_risk_level_new.csv") 
+save(CDC_community_level_county, file="Data/CDC_community_level_county.csv") 
 
 
 
