@@ -7,7 +7,7 @@ library(data.table)
 CDC_risk = fread("Data/United_States_COVID-19_County_Level_of_Community_Transmission_as_Originally_Posted.csv")
 
 #clean data
-CDC_risk_clean = CDC_risk %>%
+CDC_community_transmission = CDC_risk %>%
     select(report_date,
            state_name,
            county_name,
@@ -26,7 +26,7 @@ CDC_risk_clean = CDC_risk %>%
     arrange(date, state, county) %>%
     filter(date >= "2021/01/01")
 
-save(CDC_risk_clean, file="Data/CDC_community_transmission_county.csv") 
+save(CDC_community_transmission, file="Data/CDC_community_transmission_county.csv") 
 
 
 
