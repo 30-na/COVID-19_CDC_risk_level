@@ -5,7 +5,7 @@ library(data.table)
 library(ggplot2)
 library(scales)
 
-load("Data/CDC_risk_level_new.csv")
+load("Data/CDC_community_level_county.csv")
 
 
 #top 50 county base on the population
