@@ -50,7 +50,7 @@ bed_accupied_rate = bed_accupied %>%
     group_by(fips_code, date, state) %>%
     summarise(accupied_bed_county = sum(used_beds_covid),
               total_beds_county = sum(total_beds),
-              addmistion_county = sum(confirm_hospitalized)) %>%
+              admission_county = sum(confirm_hospitalized)) %>%
     arrange(date, state, fips_code)%>%
     mutate(accupied_rate = round(x=(accupied_bed_county/total_beds_county)*100, digit=2))
 
