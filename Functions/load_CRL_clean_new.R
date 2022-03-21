@@ -12,11 +12,13 @@ CDC_risk_clean_new = CDC_risk_new %>%
            state,
            county_fips,
            total_population,
+           covid_hospital_admissions_per_100k,
            covid_inpatient_bed_utilization) |
            ends_with("community_level"))%>%
     rename(risk_level = ends_with("community_level"),
            population = total_population,
-           bed_utilization = covid_inpatient_bed_utilization)%>%
+           bed_utilization = covid_inpatient_bed_utilization,
+           hospital_admission = covid_hospital_admissions_per_100k)%>%
     mutate(date_updated = as.Date(date_updated, format="%Y/%m/%d"),
            state = state2abbr(state),
            risk_level = factor(risk_level,
