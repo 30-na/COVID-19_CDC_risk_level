@@ -59,9 +59,11 @@ bed_accupied_rate = bed_accupied %>%
 bed_accupied_rate$accupied_rate[bed_accupied_rate$accupied_rate > 100] = NA
 bed_accupied_rate$accupied_rate[bed_accupied_rate$accupied_rate < 0] = NA
 
+
 hospitalization_county = merge(bed_accupied_rate,
                                county_population,
                                by="fips_code")
+
 
 hospitalization_county = hospitalization_county %>%
     arrange(fips_code,
