@@ -9,10 +9,17 @@ load("Data/CDC_community_level_county.csv")
 load("Data/CDC_community_level_county_computed.csv")
 
 
+# days list
+days = unique(community_level_county_computed$date)
 
-## top50 county in September 2021
-top50_county = community_level_county %>%
-    filter(date>="2021-09-01" & date<"2021-10-01")%>%
+
+# list of counties which are common in all days
+common_counties = names(table(community_level_county_computed$fips_code)[table(community_level_county_computed$fips_code) == length(days)])
+
+
+# top 50 population counties list
+top50_county = community_level_county_computed %>%
+    filter(fips_code %in% common_counties)%>%
     distinct(fips_code,
              population,
              .keep_all=TRUE)%>%
@@ -20,26 +27,30 @@ top50_county = community_level_county %>%
     slice(1:50)%>%
     select(fips_code)
 
-community_level_county_sep = community_level_county %>%
-    filter(date>="2021-09-01" & date<"2021-10-01")
+
+# four weeks interval 
+
+for(i in seq(1, length(days)-1, by=4)){
+    fourweek_interval = community_level_county_computed %>%
+        filter(date == days[i] |
+                   date == days[i+1] | 
+                   date == days[i+2] |
+                   date == days[i+3]) %>%
+        filter(fips_code %in% top50_county$fips_code)
     
+    
+    g = ggplot(fourweek_interval, aes(x=date, y=community_level,
+                                               group=1, color=community_level))+
+        geom_point()+
+        geom_line()+
+        facet_wrap(~fips_code, ncol=5)+
+        scale_x_date(date_breaks = "1 week",
+                     date_labels = "%Y/%b",
+                     date_minor_breaks = "1 day",
+                     name= "Updated Date")+
+        labs(title="computed Community level in 50 counties")
+    ggsave(paste("Result/oneMonth", i, ".jpg", sep=""),g, height=16,width=8,scale=1.65)
+    
+}
 
-# computed community level
-consistent_CRL_computed = community_level_county_sep %>%
-    dplyr::filter(community_level_county_sep$fips_code %in% top50_county$fips_code)
-
-
-
-fig10 = ggplot(consistent_CRL_computed, aes(x=date, y=community_level,
-                                  group=1, color=community_level))+
-    geom_point()+
-    geom_line()+
-    facet_wrap(~fips_code, ncol=5)+
-    scale_x_date(date_breaks = "1 week",
-                 date_labels = "%d",
-                 date_minor_breaks = "1 day",
-                 name= "Updated Date")+
-    labs(title="September 2021 computed Community level in 50 counties")
-
-ggsave("Result/Fig10.jpg",fig10, height=8,width=4,scale=1.65)
 
