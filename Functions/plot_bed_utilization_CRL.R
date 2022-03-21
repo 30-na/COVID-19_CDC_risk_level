@@ -11,12 +11,20 @@ fig7 = ggplot(na.omit(CDC_risk_clean_new), aes(x=risk_level,y=bed_utilization, c
     geom_jitter(position = position_jitter(width = 0.02))+
     geom_boxplot(alpha = 0.7)+
     coord_flip()+
-    geom_rug()
+    geom_rug()+
+    labs(title="Bed Utilizataion rate in counties with three diferent Risk Level")
     
 
 ggsave("Result/Fig7.jpg",fig7, height=4,width=8,scale=1.65)
 
+fig8 = ggplot(na.omit(CDC_risk_clean_new), aes(x=risk_level,y=hospital_admission, color=risk_level))+
+    geom_jitter(position = position_jitter(width = 0.02))+
+    geom_boxplot(alpha = 0.7)+
+    coord_flip()+
+    geom_rug()+
+    labs(title="Hospital Admission per 100k in counties with three diferent Risk Level")
 
+ggsave("Result/Fig8.jpg",fig8, height=4,width=8,scale=1.65)
 
 first_low = CDC_risk_clean_new %>%
     filter(date_updated == c("2022-03-03") &
@@ -82,8 +90,8 @@ consistant_table=data.frame("Risk.Level.Counties" = c("Low", "Medium", "High"),
                                                    nrow(consistent_high)/nrow(first_high)))
 
 
-fig8 = ggtexttable(consistant_table, rows = NULL, 
+fig9 = ggtexttable(consistant_table, rows = NULL, 
                    theme = ttheme("mOrange"))
 
 
-ggsave("Result/Fig8.jpg",fig8, height=3,width=9,scale=1)
+ggsave("Result/Fig9.jpg",fig9, height=3,width=9,scale=1)
