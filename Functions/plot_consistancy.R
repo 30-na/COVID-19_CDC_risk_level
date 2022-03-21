@@ -27,7 +27,8 @@ fig6 = ggplot(consistent_CRL, aes(x=date_updated, y=risk_level,
     scale_x_date(date_breaks = "1 week",
                  date_labels = "%b/%d",
                  date_minor_breaks = "1 day",
-                 name= "Updated Date")
+                 name= "Updated Date")+
+    labs(title="Community Risk Level Consistency in 50 most populous counties")
 
 ggsave("Result/Fig6.jpg",fig6, height=8,width=4,scale=1.65)
 
