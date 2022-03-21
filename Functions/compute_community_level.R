@@ -61,6 +61,6 @@ community_level_county$community_level[low_index] = "Low"
 community_level_county$community_level[medium_index] = "Medium"
 community_level_county$community_level[high_index] = "High"
    
+community_level_county_computed = community_level_county
 
-
-save(community_level_county, file="Data/CDC_community_level_county_computed.csv")
+save(community_level_county_computed, file="Data/CDC_community_level_county_computed.csv")
