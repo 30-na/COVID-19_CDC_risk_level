@@ -64,3 +64,21 @@ community_level_county$community_level[high_index] = "High"
 community_level_county_computed = community_level_county
 
 save(community_level_county_computed, file="Data/CDC_community_level_county_computed.csv")
+
+
+
+
+
+# Computed Hospital Admission per 100k in counties with three diferent community level plot
+hos_ad = ggplot(na.omit(community_level_county), aes(x=community_level,
+                                            y=hospital_admission_per100,
+                                            color=community_level))+
+    geom_jitter(position = position_jitter(width = 0.02))+
+    geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    coord_flip()+
+    geom_rug()+
+    labs(title="Computed Hospital Admission per 100k in counties with three diferent community level")
+
+ggsave("Result/hos_ad.jpg", hos_ad, height=4,width=8,scale=1.65)
+
+
