@@ -54,6 +54,7 @@ fig8 = ggplot(na.omit(CDC_risk_clean_new), aes(x=risk_level,y=hospital_admission
 
 ggsave("Result/Fig8.jpg",fig8, height=4,width=8,scale=1.65)
 
+
 first_low = CDC_risk_clean_new %>%
     filter(date_updated == c("2022-03-03") &
            risk_level == "Low") %>%
