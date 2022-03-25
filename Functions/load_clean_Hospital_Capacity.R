@@ -7,7 +7,7 @@ library(data.table)
 hospital_capacity = fread("Data/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_Facility.csv")
 
 
-# county polulations
+# county population
 load("Data/CDC_community_level_county.csv")
 county_population = CDC_community_level_county %>%
     select(county_fips,
@@ -25,14 +25,14 @@ bed_accupied = hospital_capacity %>%
            fips_code,
            total_beds_7_day_avg,
            inpatient_beds_used_covid_7_day_avg,
-           total_adult_patients_hospitalized_confirmed_covid_7_day_sum,
-           total_pediatric_patients_hospitalized_confirmed_covid_7_day_sum)%>%
+           previous_day_admission_adult_covid_confirmed_7_day_sum,
+           previous_day_admission_pediatric_covid_confirmed_7_day_sum)%>%
     
     rename(date = collection_week,
            total_beds = total_beds_7_day_avg,
            used_beds_covid = inpatient_beds_used_covid_7_day_avg,
-           adulat_hos_7day = total_adult_patients_hospitalized_confirmed_covid_7_day_sum,
-           pediatric_hos_7day = total_pediatric_patients_hospitalized_confirmed_covid_7_day_sum) %>%
+           adulat_hos_7day = previous_day_admission_adult_covid_confirmed_7_day_sum,
+           pediatric_hos_7day = previous_day_admission_pediatric_covid_confirmed_7_day_sum) %>%
     
     mutate(date = as.Date(date, format="%Y/%m/%d"),
            confirm_hospitalized = adulat_hos_7day + pediatric_hos_7day) %>%
@@ -63,12 +63,15 @@ bed_accupied_rate$accupied_rate[bed_accupied_rate$accupied_rate < 0] = NA
 hospitalization_county = merge(bed_accupied_rate,
                                county_population,
                                by="fips_code")
-
-
+  
 hospitalization_county = hospitalization_county %>%
     arrange(fips_code,
             date) %>%
     na.omit()
+
+
+
+
 
 save(hospitalization_county, file="Data/hospitalization_county.csv") 
 
