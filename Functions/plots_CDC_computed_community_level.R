@@ -4,6 +4,7 @@ library(usdata)
 library(data.table)
 library(ggplot2)
 library(scales)
+library(ggpubr)
 
 load("Data/CDC_community_level_county.csv")
 load("Data/CDC_community_level_county_computed.csv")
@@ -78,17 +79,19 @@ for(i in seq(1, length(days)-1, by=4)){
     no_consistent = community_level_count %>%
         filter(n != 4)
     
-    consistant_table = data.frame("Risk.Level.Counties" = c("Low", "Medium", "High"),
-                                
-                                "Consistant" = c(nrow(consistent_low),
-                                                 nrow(consistent_medium),
-                                                 nrow(consistent_high)),
-                                
-                                "Not.Consistant" = c(nrow(no_consistent)),
-                                
-                                "Consistency.Rate" = c(nrow(consistent_low)/nrow(community_level_count),
-                                                       nrow(consistent_medium)/nrow(community_level_count),
-                                                       nrow(consistent_high)/nrow(community_level_count)))
+    consistant_table = data.frame("Risk.Level.Counties" = c("Low", "Medium", "High", "Total"),
+                                  
+                                  "Consistant" = c(nrow(consistent_low),
+                                                   nrow(consistent_medium),
+                                                   nrow(consistent_high),
+                                                   nrow(total_consistent)),
+                                  
+                                  "Not.Consistant" = c(nrow(no_consistent)),
+                                  
+                                  "Consistency.Rate" = c(nrow(consistent_low)/nrow(community_level_count),
+                                                         nrow(consistent_medium)/nrow(community_level_count),
+                                                         nrow(consistent_high)/nrow(community_level_count),
+                                                         nrow(total_consistent)/nrow(community_level_count)))
     
     
     fig = ggtexttable(consistant_table, rows = NULL, 
