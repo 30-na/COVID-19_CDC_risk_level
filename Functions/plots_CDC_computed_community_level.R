@@ -10,6 +10,9 @@ load("Data/CDC_community_level_county.csv")
 load("Data/CDC_community_level_county_computed.csv")
 
 
+
+
+
 # days list
 days = unique(community_level_county_computed$date)
 
@@ -50,7 +53,7 @@ for(i in seq(1, length(days)-1, by=4)){
                      date_minor_breaks = "1 day",
                      name= "Updated Date")+
         labs(title="computed Community level in 50 counties")
-    ggsave(paste("Result/oneMonth", i, ".jpg", sep=""),g, height=16,width=8,scale=1.65)
+    ggsave(paste("Result/fourWeeks", i, ".jpg", sep=""),g, height=16,width=8,scale=1.65)
     
 }
 
@@ -96,7 +99,7 @@ for(i in seq(1, length(days)-1, by=4)){
     
     fig = ggtexttable(consistant_table, rows = NULL, 
                        theme = ttheme("mOrange"))
-    ggsave(paste("Result/oneMonth", i, "t.jpg", sep=""),fig, height=3,width=9,scale=1)
+    ggsave(paste("Result/fourWeeks.t", i, ".jpg", sep=""),fig, height=3,width=9,scale=1)
 }
 
 
@@ -170,7 +173,7 @@ for(i in seq(1, length(days)-1, by=2)){
     
     fig = ggtexttable(consistant_table, rows = NULL, 
                       theme = ttheme("mOrange"))
-    ggsave(paste("Result/twoWeeks", i, "t.jpg", sep=""),fig, height=3,width=9,scale=1)
+    ggsave(paste("Result/twoWeeks.t", i, ".jpg", sep=""),fig, height=3,width=9,scale=1)
     
     
 }
