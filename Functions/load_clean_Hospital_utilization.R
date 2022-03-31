@@ -3,8 +3,8 @@ library(dplyr)
 library(usdata)
 library(data.table)
 
-# read data from CDC Community Risk level 
-hospital_capacity = fread("Data/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_Facility.csv")
+# read data from HealthData.org 
+hospital_utilization = fread("Data/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_Facility.csv")
 
 
 # county population
@@ -23,7 +23,7 @@ county_population = CDC_community_level_county %>%
 # use the sum of "previous_day_admission_adult_covid_confirmed_7_day_sum" and 
 # "previous_day_admission_pediatric_covid_confirmed_7_day_sum" to compute admission in 100 
 
-bed_accupied = hospital_capacity %>%
+bed_accupied = hospital_utilization %>%
     select(collection_week,
            state,
            fips_code,
@@ -35,49 +35,42 @@ bed_accupied = hospital_capacity %>%
     rename(date = collection_week,
            total_beds = total_beds_7_day_avg,
            used_beds_covid = inpatient_beds_used_covid_7_day_avg,
-           adulat_hos_7day = previous_day_admission_adult_covid_confirmed_7_day_sum,
-           pediatric_hos_7day = previous_day_admission_pediatric_covid_confirmed_7_day_sum) %>%
+           adult_hos_7day = previous_day_admission_adult_covid_confirmed_7_day_sum,
+           pediatric_hos_7day = previous_day_admission_pediatric_covid_confirmed_7_day_sum)
     
-    mutate(date = as.Date(date, format="%Y/%m/%d"),
-           confirm_hospitalized = adulat_hos_7day + pediatric_hos_7day) %>%
-    
-    arrange(date, state, fips_code) %>%
-    
-    filter(date >= "2021/01/01")
+  
+#  Suppression is applied to the file for sums and averages less than four (4).
+# In these cases, the field will be replaced with “-999,999”.
+# replace -999999 with 2
+bed_accupied$total_beds[bed_accupied$total_beds == -999999] = 2
+bed_accupied$used_beds_covid[bed_accupied$used_beds_covid == -999999] = 2
+bed_accupied$adult_hos_7day[bed_accupied$adult_hos_7day == -999999] = 2
+bed_accupied$pediatric_hos_7day[bed_accupied$pediatric_hos_7day == -999999] = 2
 
-
-# less than four considered as -99999
-bed_accupied$used_beds_covid[bed_accupied$used_beds_covid < 0] = 2
-bed_accupied$confirm_hospitalized[bed_accupied$confirm_hospitalized < 0] = 2
 
 bed_accupied_rate = bed_accupied %>%
-    group_by(fips_code, date, state) %>%
-    summarise(accupied_bed_county = sum(used_beds_covid),
-              total_beds_county = sum(total_beds),
-              admission_county = sum(confirm_hospitalized)) %>%
-    arrange(date, state, fips_code)%>%
-    mutate(accupied_rate = round(x=(accupied_bed_county/total_beds_county)*100, digit=2))
-
-
-
-bed_accupied_rate$accupied_rate[bed_accupied_rate$accupied_rate > 100] = NA
-bed_accupied_rate$accupied_rate[bed_accupied_rate$accupied_rate < 0] = NA
-
-
-hospitalization_county = merge(bed_accupied_rate,
-                               county_population,
-                               by="fips_code")
   
-hospitalization_county = hospitalization_county %>%
-    arrange(fips_code,
-            date) %>%
-    na.omit()
+  arrange(date, state, fips_code) %>%
+  
+  group_by(fips_code, date, state) %>%
+  
+  summarise(total_beds_county = sum(total_beds),
+            accupied_bed_county = sum(used_beds_covid),
+            adult_hos_7day_county = sum(adult_hos_7day),
+            pediatric_hos_7day_county = sum(pediatric_hos_7day)) %>%
+  
+  mutate(date = as.Date(date, format="%Y/%m/%d"),
+         hospital_admissions = adult_hos_7day_county + pediatric_hos_7day_county,
+         bed_utilization = round(x=(accupied_bed_county/total_beds_county)*100, digit=2))
 
 
 
+bed_accupied_rate$bed_utilization[bed_accupied_rate$bed_utilization > 100] = NA
+bed_accupied_rate$bed_utilization[bed_accupied_rate$bed_utilization < 0] = NA
 
 
-save(hospitalization_county, file="Data/hospitalization_county.csv") 
+
+save(hospitalization_county, file="Data/hospital_utilization_county.csv") 
 
 
 
