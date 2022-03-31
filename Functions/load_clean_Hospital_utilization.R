@@ -19,6 +19,10 @@ county_population = CDC_community_level_county %>%
              .keep_all = TRUE)
 
 #clean data
+# use "used_beds_covid" for computing bed accupied rate
+# use the sum of "previous_day_admission_adult_covid_confirmed_7_day_sum" and 
+# "previous_day_admission_pediatric_covid_confirmed_7_day_sum" to compute admission in 100 
+
 bed_accupied = hospital_capacity %>%
     select(collection_week,
            state,

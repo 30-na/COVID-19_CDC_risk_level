@@ -19,6 +19,7 @@ new_cases = CDC_community_transmission %>%
 #When the total new case rate metric ("cases_per_100K_7_day_count_change")
 #is greater than zero and less than 10, this metric is set to "suppressed"
 new_cases$new_case[new_cases$new_case == "suppressed"] = 5
+new_cases$new_case = as.numeric(new_cases$new_case)
 merged_data = merge(hospitalization_county,
                     new_cases,
                     by=c("date", "fips_code"))
@@ -61,7 +62,7 @@ community_level_county$community_level[low_index] = "Low"
 community_level_county$community_level[medium_index] = "Medium"
 community_level_county$community_level[high_index] = "High"
    
-community_level_county_computed = community_level_county
+community_level_county_computed = na.omit(community_level_county)
 
 save(community_level_county_computed, file="Data/CDC_community_level_county_computed.csv")
 
@@ -79,6 +80,27 @@ hos_ad = ggplot(na.omit(community_level_county), aes(x=community_level,
     geom_rug()+
     labs(title="Computed Hospital Admission per 100k in counties with three diferent community level")
 
-ggsave("Result/hos_ad.jpg", hos_ad, height=4,width=8,scale=1.65)
+ggsave("Result/c_hos.jpg", hos_ad, height=4,width=8,scale=1.65)
+
+new_case = ggplot(na.omit(community_level_county), aes(x=community_level,
+                                                     y=new_case,
+                                                     color=community_level))+
+    geom_jitter(position = position_jitter(width = 0.02))+
+    geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    coord_flip()+
+    geom_rug()+
+    labs(title="New cases in counties with three diferent community level")
+
+ggsave("Result/c_newcase.jpg", new_case, height=4,width=8,scale=1.65)
 
 
+acc_rate = ggplot(na.omit(community_level_county), aes(x=community_level,
+                                                       y=accupied_rate,
+                                                       color=community_level))+
+    geom_jitter(position = position_jitter(width = 0.02))+
+    geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    coord_flip()+
+    geom_rug()+
+    labs(title="Accupied Rate in counties with three diferent community level")
+
+ggsave("Result/c_accupiedRate.jpg", acc_rate, height=4,width=8,scale=1.65)
