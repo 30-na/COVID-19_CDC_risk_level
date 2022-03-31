@@ -24,7 +24,4 @@ CDC_community_transmission = CDC_risk %>%
     arrange(date, state, fips_code) %>%
     filter(date >= "2021/01/01")
 
-save(CDC_community_transmission, file="Data/CDC_community_transmission_county.csv") 
-
-
-
+save(CDC_community_transmission, file="Data/CDC_community_transmission_county_original.csv") 
