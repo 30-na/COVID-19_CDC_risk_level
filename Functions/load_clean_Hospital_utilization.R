@@ -4,7 +4,7 @@ library(usdata)
 library(data.table)
 
 # read data from HealthData.org 
-hospital_utilization = fread("Data/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_Facility.csv")
+Hospital_Capacity = fread("Data/COVID-19_Reported_Patient_Impact_and_Hospital_Capacity_by_Facility.csv")
 
 
 # county population
@@ -23,7 +23,7 @@ county_population = CDC_community_level_county %>%
 # use the sum of "previous_day_admission_adult_covid_confirmed_7_day_sum" and 
 # "previous_day_admission_pediatric_covid_confirmed_7_day_sum" to compute admission in 100 
 
-bed_accupied = hospital_utilization %>%
+bed_accupied = Hospital_Capacity %>%
     select(collection_week,
            state,
            fips_code,
@@ -68,9 +68,9 @@ bed_accupied_rate = bed_accupied %>%
 bed_accupied_rate$bed_utilization[bed_accupied_rate$bed_utilization > 100] = NA
 bed_accupied_rate$bed_utilization[bed_accupied_rate$bed_utilization < 0] = NA
 
+hospital_utilization = bed_accupied_rate
 
-
-save(bed_accupied_rate, file="Data/hospital_utilization_county.csv") 
+save(hospital_utilization, file="Data/hospital_utilization_county.csv") 
 
 
 
