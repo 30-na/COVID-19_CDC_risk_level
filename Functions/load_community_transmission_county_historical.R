@@ -28,7 +28,9 @@ CDC_risk_clean = CDC_community_transmission_his %>%
     
     arrange(date, state, fips_code)
 
-save(CDC_risk_clean, file="Data/CDC_community_transmission_county_historical.csv") 
+CDC_community_risk_historical = CDC_risk_clean
+
+save(CDC_community_risk_historical, file="Data/CDC_community_transmission_county_historical.csv") 
 
 
 
