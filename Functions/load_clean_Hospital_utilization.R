@@ -70,7 +70,7 @@ bed_accupied_rate$bed_utilization[bed_accupied_rate$bed_utilization < 0] = NA
 
 
 
-save(hospitalization_county, file="Data/hospital_utilization_county.csv") 
+save(bed_accupied_rate, file="Data/hospital_utilization_county.csv") 
 
 
 
