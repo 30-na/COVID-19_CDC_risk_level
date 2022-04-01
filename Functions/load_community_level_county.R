@@ -4,7 +4,7 @@ library(usdata)
 library(data.table)
 
 # read data from CDC Community Risk level 
-CDC_risk_new = fread("Data/United_States_COVID-19_Community_Levels_by_County_as_Originally_Posted.csv")
+CDC_risk_new = fread("Data/United_States_COVID-19_Community_Levels_by_County.csv")
 
 #clean data
 CDC_community_level_county = CDC_risk_new %>%
@@ -25,13 +25,8 @@ CDC_community_level_county = CDC_risk_new %>%
                                levels=c("Low",
                                         "Medium",
                                         "High"))) %>%
-    arrange(date_updated, state, county_fips) %>%
-    filter(date_updated >= "2021/01/01")
+    arrange(date_updated, state, county_fips) 
 
-
-CDC_risk_clean_new$bed_utilization = as.numeric(gsub("%", "", CDC_risk_clean_new$bed_utilization))
-#CDC_risk_clean_new$county = gsub(" County.*", "", CDC_risk_clean_new$county)
-#CDC_risk_clean_new$county = gsub(",.*", "", CDC_risk_clean_new$county)
 
 save(CDC_community_level_county, file="Data/CDC_community_level_county.csv") 
 
