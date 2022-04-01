@@ -6,11 +6,11 @@ library(scales)
 
 
 # load datasets
-load("Data/hospitalization_county.csv")
-load("Data/CDC_community_transmission_county.csv")
+load("Data/hospital_utilization_county.csv")
+load("Data/CDC_community_transmission_county_historical.csv")
 
 
-new_cases = CDC_community_transmission %>%
+new_cases = CDC_community_risk_historical %>%
     select(date,
            fips_code,
            new_case)
@@ -18,14 +18,25 @@ new_cases = CDC_community_transmission %>%
 
 #When the total new case rate metric ("cases_per_100K_7_day_count_change")
 #is greater than zero and less than 10, this metric is set to "suppressed"
-new_cases$new_case[new_cases$new_case == "suppressed"] = 5
-new_cases$new_case = as.numeric(new_cases$new_case)
-merged_data = merge(hospitalization_county,
+
+merged_newcase = merge(hospital_utilization,
                     new_cases,
                     by=c("date", "fips_code"))
 
+# add county population from community level files
+load("Data/CDC_community_level_county.csv")
+county_pop = CDC_community_level_county %>%
+    dplyr::filter(date_updated == "2022-03-24") %>%
+    dplyr::select(county_fips, 
+           population) %>%
+    rename(fips_code = county_fips)
+
+merged_data = merge(merged_newcase,
+                       county_pop,
+                       by="fips_code")
+
 community_level_county = merged_data %>%
-    mutate(hospital_admission_per100 = round((admission_county/population)*100000))
+    mutate(hospital_admission_per100 = round((hospital_admissions/population)*100000))
 
 community_level_county$community_level = NA
 
