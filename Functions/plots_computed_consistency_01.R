@@ -336,6 +336,52 @@ mix1 = grid.arrange(a2week1, a3week1, a4week1, ncol = 1, nrow = 3)
 ggsave("Result/amix1.jpg", mix1, height=8,width=8,scale=1.65)
 
 
+#########################################################
+
+
+load("Data/CDC_community_level_county_computed.csv")
+
+
+
+
+
+# Computed Hospital Admission per 100k in counties with three diferent community level plot
+hos_out = boxplot(community_level_county_computed$hospital_admission_per100)$out
+
+a_hos = community_level_county_computed %>%
+    mutate(hospital_admission_per100 = replace(hospital_admission_per100,
+                                              hospital_admission_per100 %in% hos_out,0)) %>%
+    ggplot(aes(hospital_admission_per100, fill=community_level))+
+    geom_density(alpha = .2)+
+    facet_wrap(~community_level, nrow=3)+
+    labs(title="Computed Hospital Admission per 100k in counties")
+
+ggsave("Result/a_hos.jpg", a_hos, height=4,width=6,scale=1.65)
+
+new_case = ggplot((community_level_county_computed), aes(x=community_level,
+                                                         y=new_case,
+                                                         color=community_level))+
+    geom_jitter(position = position_jitter(width = 0.02))+
+    geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    coord_flip()+
+    geom_rug()+
+    labs(title="New cases in counties with three diferent community level")
+
+ggsave("Result/c_newcase.jpg", new_case, height=4,width=8,scale=1.65)
+
+
+acc_rate = ggplot((community_level_county_computed), aes(x=community_level,
+                                                         y=bed_utilization,
+                                                         color=community_level))+
+    geom_jitter(position = position_jitter(width = 0.02))+
+    geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    coord_flip()+
+    geom_rug()+
+    labs(title="Accupied Rate in counties with three diferent community level")
+
+ggsave("Result/c_accupiedRate.jpg", acc_rate, height=4,width=8,scale=1.65)
+
+
 
 
 
