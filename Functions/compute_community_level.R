@@ -122,7 +122,7 @@ new_case = ggplot((community_level_county_computed), aes(x=community_level,
 ggsave("Result/c_newcase.jpg", new_case, height=4,width=8,scale=1.65)
 
 
-acc_rate = ggplot((community_level_county_computed), aes(x=community_level,
+consisRate_box = ggplot((community_level_county_computed), aes(x=community_level,
                                                        y=bed_utilization,
                                                        color=community_level))+
     geom_jitter(position = position_jitter(width = 0.02))+
@@ -131,6 +131,6 @@ acc_rate = ggplot((community_level_county_computed), aes(x=community_level,
     geom_rug()+
     labs(title="Accupied Rate in counties with three diferent community level")
 
-ggsave("Result/c_accupiedRate.jpg", acc_rate, height=4,width=8,scale=1.65)
+ggsave("Result/c_accupiedRate.jpg", consisRate_box, height=4,width=8,scale=1.65)
 
 
