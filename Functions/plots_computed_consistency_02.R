@@ -92,21 +92,21 @@ consis_plot_3 = consis %>%
     arrange(date, community_level)%>%
     filter(consis_3weeks == 1)
 
-a3week1 = ggplot(consis_plot_3, aes(x=date, y=consisRate,
+fig_consis_rateline01 = ggplot(consis_plot_3, aes(x=date, y=consisRate,
                                     color=community_level))+
     
     geom_smooth(method = "lm",
                 formula = y ~ poly(x, 15))+
     geom_point(alpha = .5)+
     facet_wrap(~community_level, nrow=3)+
-    labs(title="Proportion of county with consistance Comunity level risk in 3weeks (polynomial regression)")
+    labs(title="consistancy Rate for each Comunity risk level in 3weeks (High and Medium merged)")
 
-ggsave("Result/aa3week_consis_Rate01.jpg", a3week1, height=4, width=8, scale=1.65)
-
-
+ggsave("Result/consistancy_rate_each_level.jpg", fig_consis_rate_line01, height=4, width=8, scale=1.65)
 
 
-a3week2 = ggplot(consis_plot_3, aes(x=date, y=consisRate,
+
+
+fig_consis_rate_line02 = ggplot(consis_plot_3, aes(x=date, y=consisRate,
                                      color=community_level))+
     
     geom_smooth(method = "lm",
@@ -115,7 +115,7 @@ a3week2 = ggplot(consis_plot_3, aes(x=date, y=consisRate,
     theme_bw()+
     labs(title="Proportion of county with consistance Comunity level risk in 3weeks (polynomial regression)")
 
-ggsave("Result/aa3week_consis_Rate02.jpg", a3week2, height=4, width=8, scale=1.65)
+ggsave("Result/consistancy_rate_each_level02.jpg", fig_consis_rate_line02, height=4, width=8, scale=1.65)
 
 
 
@@ -141,7 +141,8 @@ consis_plot_3_3 = consis %>%
     mutate(consisRate = n/total_community_level)%>%
     filter(consis_3weeks == 1)
 
-a3week4 = ggplot(consis_plot_3_3, aes(x=date,
+
+fig_consis_rate_total_line = ggplot(consis_plot_3_3, aes(x=date,
                                       y=consisRate))+
     geom_smooth(method = "lm",
                 formula = y ~ poly(x, 21))+
@@ -149,10 +150,12 @@ a3week4 = ggplot(consis_plot_3_3, aes(x=date,
     theme_bw()+
     labs(title="total proportion of consistant county in 3weeks")
 
-ggsave("Result/aa3week_consis_total.jpg", a3week4, height=4,width=8,scale=1.65)
+ggsave("Result/consistancy_rate_total.jpg", fig_consis_rate_total_line, height=4,width=8,scale=1.65)
 
 
-a3week5 = ggplot(consis_plot_3_3, aes(x=consisRate))+
+
+
+consisRate_hist = ggplot(consis_plot_3_3, aes(x=consisRate))+
     geom_histogram(alpha = .3, col="black")+
     geom_density(fill = "steelblue", alpha=.2)+
     geom_rug()+
@@ -160,17 +163,17 @@ a3week5 = ggplot(consis_plot_3_3, aes(x=consisRate))+
     labs(title="3week consistancy distribution county")
 
 
-ggsave("Result/aa3week_consis_total_density.jpg", a3week5, height=4,width=8,scale=1.65)
+ggsave("Result/consistancy_rate_hist.jpg", consisRate_hist, height=4,width=8,scale=1.65)
 
 
 
 
-a3week6 = usmap::plot_usmap(regions = "counties") + 
-    labs(title = "US Counties",
-         subtitle = "Map of the counties with available data.") + 
-    theme(panel.background = element_rect(color = "black", fill = "lightblue"))
-
-ggsave("Result/aa3week_consis_map.jpg", a3week6, height=4,width=8,scale=1.65)
+# a3week6 = usmap::plot_usmap(regions = "counties") + 
+#     labs(title = "US Counties",
+#          subtitle = "Map of the counties with available data.") + 
+#     theme(panel.background = element_rect(color = "black", fill = "lightblue"))
+# 
+# ggsave("Result/aa3week_consis_map.jpg", a3week6, height=4,width=8,scale=1.65)
 
 
 data(fips_codes)
@@ -206,7 +209,7 @@ cnames = us_state %>%
     select(region, long, lat, group) %>%
     distinct()
 
-a3weeks7 = ggplot(data = us_county,
+county_map = ggplot(data = us_county,
        mapping = aes(x = long,
                      y = lat, 
                      group = group))+
@@ -235,7 +238,7 @@ a3weeks7 = ggplot(data = us_county,
                        subtitle = "Map of the counties with available data.")
 
 
-ggsave("Result/aa3week_consis_map.jpg", a3weeks7, height=4,width=8,scale=1.65)
+ggsave("Result/available_data_county_map.jpg", county_map, height=4,width=8,scale=1.65)
 
 
 
@@ -246,7 +249,7 @@ length(unique(common_counties_df$state))
 length(unique(common_counties_df$fips_code))
 
 
-a3week8 = ggplot(consis_plot_3_3, aes(y=consis_3weeks, x=consisRate))+
+consisRate_box = ggplot(consis_plot_3_3, aes(y=consis_3weeks, x=consisRate))+
     
     geom_jitter( alpha=.3, height=.05)+
     geom_boxplot(fill="steelblue", alpha=.3)+
@@ -254,11 +257,11 @@ a3week8 = ggplot(consis_plot_3_3, aes(y=consis_3weeks, x=consisRate))+
     theme_bw()+
     labs(title="Total proportion of consistant county in 3weeks")
 
-ggsave("Result/aa3week_consis_total_box.jpg", a3week8, height=2,width=8,scale=1.65)
+ggsave("Result/consistancy_rate_box.jpg", consisRate_box, height=2,width=8,scale=1.65)
 
 
 
-a3week9 = community_level_county_computed %>%
+risk_level_proportion_line = community_level_county_computed %>%
     group_by(date) %>%
     count(community_level) %>%
     mutate(total = sum(n)) %>%
@@ -274,42 +277,46 @@ a3week9 = community_level_county_computed %>%
     scale_fill_manual(values=c("#ffeda0", "#E69F00", "#56B4E9"))+
     labs(title="proportion of counties in each risk level per week")
 
-ggsave("Result/aa3week_consis_total_box.jpg", a3week9, height=4,width=8,scale=1.65)
+ggsave("Result/proportion_each_risk_level.jpg", risk_level_proportion_line, height=4,width=8,scale=1.65)
 
 
-a3week11_count = consis %>%
-    dplyr::filter(date <= "2022-03-04") %>%
-    group_by(date) %>%
-    count(community_level) %>%
-    rename("count_community_level" = n)
+# a3week11_count = consis %>%
+#     dplyr::filter(date <= "2022-03-04") %>%
+#     group_by(date) %>%
+#     count(community_level) %>%
+#     rename("count_community_level" = n)
+# 
+# 
+# a3week11_consis = consis %>%
+#     mutate(consis_3weeks = consis_3weeks) %>%
+#     dplyr::filter(date <= "2022-03-04") %>%
+#     mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
+#     group_by(date, community_level) %>% 
+#     count(consis_3weeks)
+# 
+#   
+# a3week11 = merge(a3week11_count, a3week11_consis)%>%
+#     mutate(consisRate = round(n/count_community_level, 2)) %>%
+#     filter(consis_3weeks == 1)%>%
+#     
+#     
+#     ggplot( aes(x=date,y=consisRate,
+#                               color=community_level))+
+#     geom_smooth(method = "lm",
+#                 formula = y ~ poly(x, 15))+
+#     geom_point(alpha = .5)+
+#     facet_wrap(~community_level, nrow=3)+
+#     labs(title="consistancy rate in each risk level per week (3 weeks)")
+# 
+# ggsave("Result/aa3week_consis_Rate011.jpg", a3week11, height=4, width=8, scale=1.65)
+# 
 
 
-a3week11_consis = consis %>%
-    mutate(consis_3weeks = consis_3weeks) %>%
-    dplyr::filter(date <= "2022-03-04") %>%
-    mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
-    group_by(date, community_level) %>% 
-    count(consis_3weeks)
 
-  
-a3week11 = merge(a3week11_count, a3week11_consis)%>%
-    mutate(consisRate = round(n/count_community_level, 2)) %>%
-    filter(consis_3weeks == 1)%>%
-    
-    
-    ggplot( aes(x=date,y=consisRate,
-                              color=community_level))+
-    geom_smooth(method = "lm",
-                formula = y ~ poly(x, 15))+
-    geom_point(alpha = .5)+
-    facet_wrap(~community_level, nrow=3)+
-    labs(title="consistancy rate in each risk level per week (3 weeks)")
-
-ggsave("Result/aa3week_consis_Rate011.jpg", a3week11, height=4, width=8, scale=1.65)
+fig_facet_proportion_RL_consisRate = grid.arrange(fig_consis_rate_line01_hm,
+                                                     fig_risk_level_proportion_line,
+                                                     nrow=1)
+ggsave("Result/consisRate_RLProportion_facet.jpg", fig_facet_proportion_RL_consisRate, height=4,width=8,scale=1.65)
 
 
-
-
-a3week10 = grid.arrange(a3week9, a3week11, nrow=1)
-ggsave("Result/aa3week_mix.jpg", a3week10, height=4,width=8,scale=1.65)
 
