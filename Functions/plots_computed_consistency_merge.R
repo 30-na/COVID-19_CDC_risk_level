@@ -314,6 +314,7 @@ fig_consisRate_box_HM = ggplot(consis_plot_3_3, aes(y=consis_3weeks, x=consisRat
     
     geom_jitter( alpha=.3, height=.05)+
     geom_boxplot(fill="steelblue", alpha=.3)+
+    xlim(0, 1)+
     geom_rug()+
     theme_bw()+
     labs(title="Total proportion of consistant county in 3weeks (High and Medium merged)")
@@ -649,6 +650,7 @@ fig_consisRate_box_LM = ggplot(consis_plot_3_3, aes(y=consis_3weeks, x=consisRat
     
     geom_jitter( alpha=.3, height=.05)+
     geom_boxplot(fill="steelblue", alpha=.3)+
+    xlim(0, 1)+
     geom_rug()+
     theme_bw()+
     labs(title="Total proportion of consistant county in 3weeks (Low and Medium merged)")
@@ -994,6 +996,7 @@ fig_consisRate_box = ggplot(consis_plot_3_3, aes(y=consis_3weeks, x=consisRate))
     
     geom_jitter( alpha=.3, height=.05)+
     geom_boxplot(fill="steelblue", alpha=.3)+
+    xlim(0, 1)+
     geom_rug()+
     theme_bw()+
     labs(title="Total proportion of consistant county in 3weeks")
