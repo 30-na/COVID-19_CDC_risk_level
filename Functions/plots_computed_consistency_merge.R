@@ -1,6 +1,5 @@
 library(dplyr)
 library(usdata)
-library(data.table)
 library(ggplot2)
 library(scales)
 library(tidyr)
@@ -39,30 +38,13 @@ consis = community_level_county_computed %>%
     arrange(fips_code,
             date)
 
-# number of unique community level in four weeks interval
-consis_4weeks = c()
-for(i in 1:nrow(consis)){
-    consis_4weeks[i] = length(unique(c(consis$community_level[i],
-                                       consis$community_level[i+1],
-                                       consis$community_level[i+2],
-                                       consis$community_level[i+3])))
-}
-
-
+# number of unique community level in three weeks interval
 consis_3weeks = c()
 for(i in 1:nrow(consis)){
     consis_3weeks[i] = length(unique(c(consis$community_level[i],
                                        consis$community_level[i+1],
                                        consis$community_level[i+2])))
 }
-
-
-consis_2weeks = c()
-for(i in 1:nrow(consis)){
-    consis_2weeks[i] = length(unique(c(consis$community_level[i],
-                                       consis$community_level[i+1])))
-}
-
 
 consis$consis_3weeks = consis_3weeks
 
