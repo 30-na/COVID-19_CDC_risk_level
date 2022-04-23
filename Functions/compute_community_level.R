@@ -62,14 +62,14 @@ low_index =
 
 medium_index = 
     (community_level_county$new_case < 200 &
-         (community_level_county$hospital_admission_per100 > 10 &
+         (community_level_county$hospital_admission_per100 >= 10 &
               community_level_county$hospital_admission_per100 < 20)) |
     (community_level_county$new_case < 200 &
-         (community_level_county$bed_utilization > 10 &
+         (community_level_county$bed_utilization >= 10 &
               community_level_county$bed_utilization < 15)) |
-    (community_level_county$new_case > 200 &
+    (community_level_county$new_case >= 200 &
          community_level_county$hospital_admission_per100 < 10) |
-    (community_level_county$new_case > 200 &
+    (community_level_county$new_case >= 200 &
          community_level_county$bed_utilization < 10)
 
 high_index = 
