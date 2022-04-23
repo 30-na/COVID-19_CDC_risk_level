@@ -119,20 +119,8 @@ ggsave("Result/consistancy_rate_each_level02.jpg", fig_consis_rate_line02, heigh
 
 
 
-
-
-consis_plot_3_2 = consis %>%
-    filter(date > "2020-08-07") %>%
-    mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
-    arrange(date) %>%
-    group_by(date, community_level) %>%
-    count(consis_3weeks) %>%
-    mutate(total_community_level = sum(n)) %>%
-    mutate(consisRate = n/total_community_level)%>%
-    arrange(date, community_level)
-
-
 consis_plot_3_3 = consis %>%
+    filter(date <= "2022-03-04") %>%
     mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
     arrange(date) %>%
     group_by(date) %>%
