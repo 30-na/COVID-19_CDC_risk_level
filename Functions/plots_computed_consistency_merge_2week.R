@@ -105,6 +105,7 @@ fig_consis_rate_line02_HM = ggplot(data = consis_plot_3,
 
 # plot the total consistency Rate line
 consis_plot_3_3 = consis %>%
+    filter(date <= "2022-03-11") %>%
     mutate(consis_2weeks = replace(consis_2weeks, consis_2weeks != 1, 0)) %>%
     arrange(date) %>%
     group_by(date) %>%
@@ -245,6 +246,7 @@ fig_consis_rate_line02_LM = ggplot(data = consis_plot_3,
 
 
 consis_plot_3_3 = consis %>%
+    filter(date <= "2022-03-11") %>%
     mutate(consis_2weeks = replace(consis_2weeks, consis_2weeks != 1, 0)) %>%
     arrange(date) %>%
     group_by(date) %>%
@@ -387,6 +389,7 @@ fig_consis_rate_line02 = ggplot(data = consis_plot_3,
 
 
 consis_plot_3_3 = consis %>%
+    filter(date <= "2022-03-11") %>%
     mutate(consis_2weeks = replace(consis_2weeks, consis_2weeks != 1, 0)) %>%
     arrange(date) %>%
     group_by(date) %>%
