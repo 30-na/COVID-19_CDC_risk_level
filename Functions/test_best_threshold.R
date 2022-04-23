@@ -8,6 +8,7 @@ library(dplyr)
 library(maps)
 library(tidycensus)
 library(gridExtra)
+library(PerformanceAnalytics)
 
 
 # load datasets
@@ -58,11 +59,11 @@ community_level_county = community_level_county %>%
 # compute community_level
 community_level_county$community_level = NA
 
-new = seq(150, 250, by = 10)
-hos_min = seq(5, 25, by = 1)
-hos_max = seq(5, 25, by = 1)
-bed_min = seq(5, 20, by = 1)
-bed_max = seq(5, 20, by = 1)
+new = seq(200, 400, by = 10)
+hos_min = seq(20, 40, by = 5)
+hos_max = seq(20, 40, by = 5)
+bed_min = 10
+bed_max = 15
 
 # new = 200
 # hos_min = 10
@@ -86,11 +87,11 @@ medium_index =
          (community_level_county$hospital_admission_per100 > hos_min &
               community_level_county$hospital_admission_per100 < hos_max)) |
     (community_level_county$new_case < new &
-         (community_level_county$bed_utilization > bed_min &
+         (community_level_county$bed_utilization >= bed_min &
               community_level_county$bed_utilization < bed_max)) |
-    (community_level_county$new_case > new &
+    (community_level_county$new_case >= new &
          community_level_county$hospital_admission_per100 < hos_min) |
-    (community_level_county$new_case > new &
+    (community_level_county$new_case >= new &
          community_level_county$bed_utilization < bed_min)
 
 high_index = 
@@ -107,132 +108,175 @@ return(list(low_index,
             high_index))
 }
 
-result=0
-result.names = c("mean", "median", "n", "b1", "b2", "h3", "h4")
+result = matrix(NA,
+                nrow = 0,
+                ncol = 10)
+colnames(result) = c("mean_total",
+                     "median_total",
+                     "mean_low",
+                     "mean_medium",
+                     "mean_high",
+                     "n", "b1", "b2", "h1", "h2")
 
 for(n in new){
     for(b1 in bed_min){
-        for(b2 in bed_max){
-            for(h1 in hos_min){
-                for(h2 in hos_max){
-
-                    
-                    cdc = level_threshold(new = n,
-                                          hos_min = h1,
-                                          hos_max = h2,
-                                          bed_min = b1,
-                                          bed_max = b2)
-                    
-                    low_index = cdc[[1]]
-                    medium_index = cdc[[2]]
-                    high_index = cdc[[3]]
-                    
-                    
-                    community_level_county$community_level[low_index] = "Low"
-                    community_level_county$community_level[medium_index] = "Medium"
-                    community_level_county$community_level[high_index] = "High"
-                    
-                    community_level_county_computed = community_level_county %>%
-                        drop_na(community_level)
-                    
-                    
-                    # days list
-                    days = unique(community_level_county_computed$date)
-                    
-                    common_counties_df = community_level_county_computed %>%
-                        group_by(state, fips_code)%>%
-                        count(fips_code)%>%
-                        filter(n == length(days))%>%
-                        select(state, fips_code) %>%
-                        mutate(state = tolower(abbr2state(state)))
-                    
-                    
-                    
-                    # list of counties which are common in all days
-                    common_counties = names(table(community_level_county_computed$fips_code)[table(community_level_county_computed$fips_code) == length(days)])
-                    
-                    
-                    #filter common counties data
-                    CL_common = community_level_county_computed %>% 
-                        dplyr::filter(fips_code %in% common_counties)
-                    
-                    
-                    
-                    # four weeks interval 
-                    
-                    consis = CL_common %>%
-                        select(date,
-                               fips_code,
-                               community_level) %>%
-                        group_by(fips_code) %>%
-                        arrange(fips_code,
-                                date)
-                    
-                    
-                    
-                    
-                    # 
-                    # consis_4weeks = c()
-                    # for(i in 4:nrow(consis)){
-                    #     consis_4weeks[i] = length(unique(c(consis$community_level[i],
-                    #                                        consis$community_level[i-1],
-                    #                                        consis$community_level[i-2],
-                    #                                        consis$community_level[i-3])))
-                    #     
-                    # }
-                    
-                    
-                    consis_3weeks = c()
-                    for(i in 1:nrow(consis)){
-                        consis_3weeks[i] = length(unique(c(consis$community_level[i],
-                                                           consis$community_level[i+1],
-                                                           consis$community_level[i+2])))
+            for(b2 in bed_max){
+                if(b1 < b2){
+                for(h1 in hos_min){
+                        for(h2 in hos_max){
+                            if(h1 < h2){
+                            
+                            cdc = level_threshold(new = n,
+                                                  hos_min = h1,
+                                                  hos_max = h2,
+                                                  bed_min = b1,
+                                                  bed_max = b2)
+                            
+                            low_index = cdc[[1]]
+                            medium_index = cdc[[2]]
+                            high_index = cdc[[3]]
+                            
+                            
+                            community_level_county$community_level[low_index] = "Low"
+                            community_level_county$community_level[medium_index] = "Medium"
+                            community_level_county$community_level[high_index] = "High"
+                            
+                            community_level_county_computed = community_level_county %>%
+                                drop_na(community_level)
+                            
+                            
+                            # days list
+                            days = unique(community_level_county_computed$date)
+                            
+                            common_counties_df = community_level_county_computed %>%
+                                group_by(state, fips_code)%>%
+                                count(fips_code)%>%
+                                filter(n == length(days))%>%
+                                select(state, fips_code) %>%
+                                mutate(state = tolower(abbr2state(state)))
+                            
+                            
+                            
+                            # list of counties which are common in all days
+                            common_counties = names(table(community_level_county_computed$fips_code)[table(community_level_county_computed$fips_code) == length(days)])
+                            
+                            
+                            #filter common counties data
+                            CL_common = community_level_county_computed %>% 
+                                dplyr::filter(fips_code %in% common_counties)
+                            
+                            
+                            
+                            # four weeks interval 
+                            
+                            consis = CL_common %>%
+                                select(date,
+                                       fips_code,
+                                       community_level) %>%
+                                group_by(fips_code) %>%
+                                arrange(fips_code,
+                                        date)
+                            
+                            
+                            
+                            
+                            # 
+                            # consis_4weeks = c()
+                            # for(i in 4:nrow(consis)){
+                            #     consis_4weeks[i] = length(unique(c(consis$community_level[i],
+                            #                                        consis$community_level[i-1],
+                            #                                        consis$community_level[i-2],
+                            #                                        consis$community_level[i-3])))
+                            #     
+                            # }
+                            
+                            
+                            consis_3weeks = c()
+                            for(i in 1:nrow(consis)){
+                                consis_3weeks[i] = length(unique(c(consis$community_level[i],
+                                                                   consis$community_level[i+1],
+                                                                   consis$community_level[i+2])))
+                                
+                            }
+                            
+                            # 
+                            # consis_2weeks = c()
+                            # for(i in 2:nrow(consis)){
+                            #     consis_2weeks[i] = length(unique(c(consis$community_level[i],
+                            #                                        consis$community_level[i-1])))
+                            #     
+                            # }
+                            
+                            
+                            
+                            
+                            ############# 3-weeeks ####################################################
+                            consis$consis_3weeks = consis_3weeks
+                            
+                            consis_plot_3_3 = consis %>%
+                                filter(date <= "2022-03-04") %>%
+                                mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
+                                arrange(date) %>%
+                                group_by(date) %>%
+                                count(consis_3weeks) %>%
+                                mutate(total_community_level = sum(n)) %>%
+                                mutate(consisRate = n/total_community_level)%>%
+                                filter(consis_3weeks == 1)
                         
+                            
+                            consis_plot_3 = consis %>%
+                                filter(date <= "2022-03-04") %>%
+                                mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
+                                arrange(date) %>%
+                                group_by(date, community_level) %>%
+                                count(consis_3weeks) %>%
+                                mutate(total_community_level = sum(n)) %>%
+                                mutate(consisRate = n/total_community_level)%>%
+                                arrange(date, community_level)%>%
+                                filter(consis_3weeks == 1)
+                            
+                            mean_total = mean(consis_plot_3_3$consisRate)
+                            median_total = median(consis_plot_3_3$consisRate)
+                            mean_low = mean(filter(consis_plot_3,
+                                                    community_level == "Low")$consisRate)
+                            mean_med = mean(filter(consis_plot_3,
+                                                    community_level == "Medium")$consisRate)
+                            mean_high = mean(filter(consis_plot_3,
+                                                    community_level == "High")$consisRate)
+                            
+                            result = rbind(result, 
+                                           c(mean_total,
+                                             median_total,
+                                             mean_low,
+                                             mean_med,
+                                             mean_high,
+                                             n,
+                                             b1,
+                                             b2,
+                                             h1,
+                                             h2))
+                            
+                            
+                        }
                     }
-                    
-                    # 
-                    # consis_2weeks = c()
-                    # for(i in 2:nrow(consis)){
-                    #     consis_2weeks[i] = length(unique(c(consis$community_level[i],
-                    #                                        consis$community_level[i-1])))
-                    #     
-                    # }
-                    
-                    
-                    
-                    
-                    ############# 3-weeeks ####################################################
-                    consis$consis_3weeks = consis_3weeks
-                    
-                    consis_plot_3_3 = consis %>%
-                        mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
-                        arrange(date) %>%
-                        group_by(date) %>%
-                        count(consis_3weeks) %>%
-                        mutate(total_community_level = sum(n)) %>%
-                        mutate(consisRate = n/total_community_level)%>%
-                        filter(consis_3weeks == 1)
-                    
-                    mean = mean(consis_plot_3_3$consisRate)
-                    median = median(consis_plot_3_3$consisRate)
-                    
-                    result = rbind(result, 
-                                   c(mean,
-                                     median,
-                                     n,
-                                     b1,
-                                     b2,
-                                     h1,
-                                     h2))
-                    
-                    
                 }
             }
         }
+        
+        
+        
     }
-}
+                        
+                    }
+                    
+        
+        
 
+result_df = as.data.frame(result)
 
-
-
+result_h02 = result_df
+save(result_h02, file="Data/best_threshold_h02.Rda")           
+            
+load("Data/best_threshold.csv")
+load("Data/best_threshold_h.Rda")
 
