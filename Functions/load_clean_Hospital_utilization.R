@@ -42,17 +42,17 @@ bed_accupied = Hospital_Capacity %>%
 #  Suppression is applied to the file for sums and averages less than four (4).
 # In these cases, the field will be replaced with “-999,999”.
 # replace -999999 with 2
-bed_accupied$total_beds[bed_accupied$total_beds == -999999] = 2
-bed_accupied$used_beds_covid[bed_accupied$used_beds_covid == -999999] = 2
-bed_accupied$adult_hos_7day[bed_accupied$adult_hos_7day == -999999] = 2
-bed_accupied$pediatric_hos_7day[bed_accupied$pediatric_hos_7day == -999999] = 2
+# bed_accupied$total_beds[bed_accupied$total_beds == -999999] = 2
+# bed_accupied$used_beds_covid[bed_accupied$used_beds_covid == -999999] = 2
+# bed_accupied$adult_hos_7day[bed_accupied$adult_hos_7day == -999999] = 2
+# bed_accupied$pediatric_hos_7day[bed_accupied$pediatric_hos_7day == -999999] = 2
 
 
-# set.seed(214654)
-# bed_accupied$total_beds[bed_accupied$total_beds == -999999] = sample(x = c(1,2,3), size = 1)
-# bed_accupied$used_beds_covid[bed_accupied$used_beds_covid == -999999] = sample(x = c(1,2,3), size = 1)
-# bed_accupied$adult_hos_7day[bed_accupied$adult_hos_7day == -999999] = sample(x = c(1,2,3), size = 1)
-# bed_accupied$pediatric_hos_7day[bed_accupied$pediatric_hos_7day == -999999] = sample(x = c(1,2,3), size = 1)
+set.seed(214654)
+bed_accupied$total_beds[bed_accupied$total_beds == -999999] = sample(x = c(1,2,3), size = 1)
+bed_accupied$used_beds_covid[bed_accupied$used_beds_covid == -999999] = sample(x = c(1,2,3), size = 1)
+bed_accupied$adult_hos_7day[bed_accupied$adult_hos_7day == -999999] = sample(x = c(1,2,3), size = 1)
+bed_accupied$pediatric_hos_7day[bed_accupied$pediatric_hos_7day == -999999] = sample(x = c(1,2,3), size = 1)
 
 
 
