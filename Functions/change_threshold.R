@@ -91,6 +91,7 @@ high_index =
 
 
 #######################PART I (HIGH amd MEDIUM MERGED)###################
+community_level_county$community_level = NA
 community_level_county$community_level[low_index] = "Low"
 community_level_county$community_level[medium_index] = "High"
 community_level_county$community_level[high_index] = "High"
@@ -103,6 +104,7 @@ community_level_county_computed = community_level_county %>%
 save(community_level_county_computed, file="Data/CDC_community_level_county_computed_merged_Medium_With_High.csv")
 
 ######################PART II (LOW amd MEDIUM MERGED)###################
+community_level_county$community_level = NA
 community_level_county$community_level[low_index] = "Low"
 community_level_county$community_level[medium_index] = "Low"
 community_level_county$community_level[high_index] = "High"
@@ -115,6 +117,7 @@ community_level_county_computed = community_level_county %>%
 save(community_level_county_computed, file="Data/CDC_community_level_county_computed_merged_Medium_With_Low.csv")
 
 #########################LOW MEDIUM HIGH #################################
+community_level_county$community_level = NA
 community_level_county$community_level[low_index] = "Low"
 community_level_county$community_level[medium_index] = "Medium"
 community_level_county$community_level[high_index] = "High"

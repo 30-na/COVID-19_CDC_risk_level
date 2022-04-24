@@ -368,7 +368,7 @@ consis_plot_3 = consis %>%
     filter(date <= "2022-03-04") %>%
     mutate(consis_3weeks = replace(consis_3weeks, consis_3weeks != 1, 0)) %>%
     arrange(date) %>%
-    group_by(date, community_level) %>%
+    group_by(date, community_level)%>%
     count(consis_3weeks) %>%
     mutate(total_community_level = sum(n)) %>%
     mutate(consisRate = n/total_community_level)%>%
