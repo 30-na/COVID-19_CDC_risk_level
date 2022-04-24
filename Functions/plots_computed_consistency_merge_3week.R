@@ -429,7 +429,10 @@ mean_high = mean(filter(consis_plot_3,
                         community_level == "High")$consisRate)
 
 
-
+result_table_original = data.frame("Total Mean" = mean_total,
+                          "Low Risk Mean" = mean_low,
+                          "Medium Risk Mean" = mean_med,
+                          "High Risk Mean" = mean_high)
 
 
 fig_consis_rate_total_line = ggplot(consis_plot_3_3, aes(x=date,

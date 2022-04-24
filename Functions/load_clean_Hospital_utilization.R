@@ -50,8 +50,11 @@ bed_accupied = Hospital_Capacity %>%
 
 set.seed(214654)
 bed_accupied$total_beds[bed_accupied$total_beds == -999999] = sample(x = c(1,2,3), size = 1)
+set.seed(214654)
 bed_accupied$used_beds_covid[bed_accupied$used_beds_covid == -999999] = sample(x = c(1,2,3), size = 1)
+set.seed(214654)
 bed_accupied$adult_hos_7day[bed_accupied$adult_hos_7day == -999999] = sample(x = c(1,2,3), size = 1)
+set.seed(214654)
 bed_accupied$pediatric_hos_7day[bed_accupied$pediatric_hos_7day == -999999] = sample(x = c(1,2,3), size = 1)
 
 

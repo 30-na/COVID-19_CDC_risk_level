@@ -53,9 +53,9 @@ community_level_county = community_level_county %>%
 
 
 new = 200
-hos_min = 10
+hos_min = 5
 hos_max = 20
-bed_min = 10
+bed_min = 5
 bed_max = 15
 
 
@@ -67,7 +67,7 @@ low_index =
 
 medium_index = 
     (community_level_county$new_case < new &
-         (community_level_county$hospital_admission_per100 > hos_min &
+         (community_level_county$hospital_admission_per100 >= hos_min &
               community_level_county$hospital_admission_per100 < hos_max)) |
     (community_level_county$new_case < new &
          (community_level_county$bed_utilization >= bed_min &
