@@ -375,6 +375,9 @@ consis_plot_3 = consis %>%
     arrange(date, community_level)%>%
     filter(consis_3weeks == 1)
 
+
+
+
 fig_consis_rate_line01 = ggplot(consis_plot_3, aes(x=date, y=consisRate,
                                                   color=community_level))+
     
@@ -413,6 +416,20 @@ consis_plot_3_3 = consis %>%
     mutate(total_community_level = sum(n)) %>%
     mutate(consisRate = n/total_community_level)%>%
     filter(consis_3weeks == 1)
+
+
+
+mean_total = mean(consis_plot_3_3$consisRate)
+median_total = median(consis_plot_3_3$consisRate)
+mean_low = mean(filter(consis_plot_3,
+                       community_level == "Low")$consisRate)
+mean_med = mean(filter(consis_plot_3,
+                       community_level == "Medium")$consisRate)
+mean_high = mean(filter(consis_plot_3,
+                        community_level == "High")$consisRate)
+
+
+
 
 
 fig_consis_rate_total_line = ggplot(consis_plot_3_3, aes(x=date,
