@@ -579,7 +579,7 @@ fig_compare_consisRate_total_line = grid.arrange(fig_consis_rate_total_line,
                                                  fig_consis_rate_total_line_HM,
                                                  fig_consis_rate_total_line_LM,
                                                  nrow = 3)
-ggsave("Result/compare_consisRate_total.jpg",
+ggsave("Result/compare_consisRate_total_modified_thereshold.jpg",
        fig_compare_consisRate_total_line, 
        height=4,width=8,scale=1.65)
 
@@ -588,7 +588,7 @@ fig_compare_consisRate_line = grid.arrange(fig_consis_rate_line02,
                                            fig_consis_rate_line02_LM,
                                            fig_consis_rate_line02_HM,
                                            nrow = 3)
-ggsave("Result/compare_consisRate.jpg",
+ggsave("Result/compare_consisRate_modified_thereshold.jpg",
        fig_compare_consisRate_line, 
        height=5,width=8,scale=1.65)
 
@@ -597,7 +597,7 @@ fig_compare_consisRate_box = grid.arrange(fig_consisRate_box ,
                                           fig_consisRate_box_HM,
                                           fig_consisRate_box_LM,
                                           nrow = 3)
-ggsave("Result/compare_consisRate_box.jpg",
+ggsave("Result/compare_consisRate_box_modified_thereshold.jpg",
        fig_compare_consisRate_box, 
        height=4,width=8,scale=1.65)
 
