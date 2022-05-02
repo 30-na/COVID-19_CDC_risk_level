@@ -13,6 +13,7 @@ Datasets:
 5. [COVID-19 Reported Patient Impact and Hospital Capacity by Facility](https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/anag-cw7u)
 6. [United States COVID-19 Community Levels by County as Originally Posted](https://data.cdc.gov/Public-Health-Surveillance/United-States-COVID-19-Community-Levels-by-County-/3nnm-4jni)
 7. [USA Counties](https://hub.arcgis.com/datasets/esri::usa-counties/about)
+8. [COVID-19 Vaccinations in the United States,County](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh)
 -----------
 Features:
 
