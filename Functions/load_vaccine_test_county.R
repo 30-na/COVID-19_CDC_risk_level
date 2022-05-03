@@ -9,7 +9,7 @@ library(gifski)
 # load CDC vaccine county dataset
 vaccine_file = fread("Data/COVID-19_Vaccinations_in_the_United_States_County.csv")
 
-remotes::install_github('thomasp85/gganimate')
+
 # clean Dataset
 vaccine_df = vaccine_file %>%
     select(Date,
