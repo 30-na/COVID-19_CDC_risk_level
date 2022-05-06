@@ -18,35 +18,12 @@ vaccine_df = vaccine_file %>%
            Recip_State,
            Series_Complete_Pop_Pct) %>%
     mutate(Date = as.Date(Date, format = "%m/%d/%Y"))%>%
+    filter(Date > "2021-01-01")%>%
     mutate(vaccine_category = cut(Series_Complete_Pop_Pct,
                                   breaks = c(-Inf, 30, 40, 50, 60, 70, Inf),
                                   labels = c("0%-29.9%", "30%-39.9%",
                                              "40%-49.9%", "50%-59.9%",
-                                             "60%-69.9%","70%-100%"))) %>%
-    filter(Date > "2021-01-01")
-
-# Load Test positive
-community_transmission = fread("Data/United_States_COVID-19_County_Level_of_Community_Transmission_Historical_Changes.csv")
-positive_rate = community_transmission %>%
-    select(county_name,
-           fips_code,
-           date,
-           percent_test_results_reported_positive_last_7_days) %>%
-    mutate(date = as.Date(date, format = "%m/%d/%Y")) %>%
-    rename("positive_rate" = percent_test_results_reported_positive_last_7_days) %>%
-    rename("Recip_County" = county_name) %>%
-    rename("FIPS" = fips_code) %>%
-    rename("Date" = date) %>%
-    arrange(Date, Recip_County) %>%
-    filter(Date > "2021-01-01") %>%
-    mutate(FIPS = as.character(FIPS))
-    
-merge_data = inner_join(positive_rate, 
-                        vaccine_df,
-                        by = c("Date","FIPS", "Recip_County"))
-   
-str(positive_rate)
-
+                                             "60%-69.9%","70%-100%")))
 
 # time series for each vaccine category rate
 vaccine_time = vaccine_df %>%
@@ -56,13 +33,51 @@ vaccine_time = vaccine_df %>%
     rename("count_county" = "n")%>%
     filter(!is.na(vaccine_category))%>%
     mutate(sum_county = sum(count_county)) %>%
-    mutate(category_rate = round(count_county / sum_county, 2))
+    mutate(vaccine_category_rate = round(count_county / sum_county, 2))
 
 
 
+# Load Test positive
+community_transmission = fread("Data/United_States_COVID-19_County_Level_of_Community_Transmission_Historical_Changes.csv")
+positive_test_df = community_transmission %>%
+    select(county_name,
+           fips_code,
+           date,
+           percent_test_results_reported_positive_last_7_days) %>%
+    mutate(date = as.Date(date, format = "%m/%d/%Y")) %>%
+    filter(date > "2021-01-01") %>%
+    rename("positive_rate" = percent_test_results_reported_positive_last_7_days) %>%
+    rename("Recip_County" = county_name) %>%
+    rename("FIPS" = fips_code) %>%
+    rename("Date" = date) %>%
+    arrange(Date, Recip_County) %>%
+    mutate(FIPS = as.character(FIPS))%>%
+    mutate(positive_test_category = cut(positive_rate,
+                                  breaks = c(-Inf, 5, 10, 15, 20, Inf),
+                                  labels = c("0%-4.9%", "5%-9.9%",
+                                             "10%-14.9%", "15%-19.9%",
+                                             "20%-100%")))
+
+# time series for each positive test category rate
+positive_test_time = positive_test_df %>%
+    group_by(Date) %>%
+    arrange(Date, positive_test_category) %>%
+    count(positive_test_category, .drop=FALSE) %>%
+    rename("count_county" = "n") %>%
+    filter(!is.na(positive_test_category))%>%
+    mutate(sum_county = sum(count_county)) %>%
+    mutate(positive_test_category_rate = round(count_county / sum_county, 2))
+
+
+merge_data = inner_join(positive_rate, 
+                        vaccine_df,
+                        by = c("Date","FIPS", "Recip_County"))
+
+
+# plot the vaccine category rate
 fig_vaccine_category_rate = ggplot(data = vaccine_time,
                                    aes(x = Date,
-                                       y = category_rate,
+                                       y = vaccine_category_rate,
                                        color = vaccine_category)) +
     geom_smooth(method = "lm",
                 formula = y ~ poly(x, 27),
@@ -71,11 +86,24 @@ fig_vaccine_category_rate = ggplot(data = vaccine_time,
     labs(title = "Vaccine Category Rate")+
     scale_color_manual(values=c('#d73027','#fc8d59','#fee08b','#d9ef8b','#91cf60','#1a9850'))
 
-
 ggsave("Result/vaccine_category_rate.jpg", fig_vaccine_category_rate, height=4,width=8,scale=1.65)
 
 
+# plot the positive test category rate
+fig_positive_test_category_rate = ggplot(data = positive_test_time,
+                                   aes(x = Date,
+                                       y = positive_test_category_rate,
+                                       color = positive_test_category)) +
+    geom_smooth(method = "lm",
+                formula = y ~ poly(x, 27),
+                se = FALSE)+
+    geom_point(size = .5, alpha=.1)+
+    labs(title = "Positive Test Category Rate")+
+    scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fc8d59','#d73027'))
 
+ggsave("Result/positive_test_category_rate.jpg", fig_positive_test_category_rate, height=4,width=8,scale=1.65)
+
+c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027')
 
 # USA map with vaccine rate category
 us_county = map_data("county")
@@ -115,6 +143,8 @@ fig_vaccine_map = ggplot(data = county_vaccine_map,
     scale_fill_manual(values=c('#ffffcc','#c7e9b4','#7fcdbb','#41b6c4','#2c7fb8','#253494','#cccccc'))
 
 ggsave("Result/vaccine_county_2022-04-30.jpg", fig_vaccine_map, height=4,width=8,scale=1.65)
+
+
 
 
 # 
