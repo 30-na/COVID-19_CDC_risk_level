@@ -115,7 +115,7 @@ fig_positive_test_category_rate = ggplot(data = positive_test_time,
                 se = FALSE)+
     geom_point(size = .5, alpha=.1)+
     labs(title = "Positive Test Category Rate")+
-    scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fc8d59','#d73027'))
+    scale_color_manual(values=c('#d73027','#fc8d59','#fee08b','#d9ef8b','#91cf60','#1a9850'))
 
 ggsave("Result/positive_test_category_rate.jpg", fig_positive_test_category_rate, height=4,width=8,scale=1.65)
 
@@ -134,6 +134,18 @@ ggsave("Result/positive_test_category_rate_col.jpg",
        fig_positive_test_category_rate_col,
        height=4,width=8,scale=1.65)
 
+
+
+# fig_vaccine_category_rate_dens = ggplot(data = positive_test_time,
+#                                         aes(x = positive_test_category_rate,
+#                                             fill = positive_test_category)) +
+#     geom_density(position = "fill") +
+#     scale_fill_brewer(palette = "Blues") +
+#     labs(title = "Positive Test Category Density")
+# 
+# ggsave("Result/fig_vaccine_category_rate_dens.jpg",
+#        fig_vaccine_category_rate_dens,
+#        height=4,width=8,scale=1.65)
 
 
 # USA map with vaccine rate category
@@ -175,6 +187,9 @@ fig_vaccine_map = ggplot(data = county_vaccine_map,
 
 ggsave("Result/vaccine_county_2022-04-30.jpg", fig_vaccine_map, height=4,width=8,scale=1.65)
 
+
+
+
 # faccet wrap to compare
 fig_compare_vaccine_positive_col = grid.arrange(fig_positive_test_category_rate_col,
                                                 fig_vaccine_category_rate_col,
@@ -204,5 +219,20 @@ ggsave("Result/fig_compare_vaccine_positive_col.jpg",
 # Result/vaccine_category_county.jpg
 # 
 # ?anim_save
+
+# plot the positive test category rate column
+myPlot = ggplot(data = positive_test_time,
+                                             aes(x = Date,
+                                                 y = positive_test_category_rate,
+                                                 fill = positive_test_category)) +
+    geom_col()+
+    labs(title = "Positive Test Category Rate")+
+    scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))+
+    labs(title = 'Date: {frame_time}', x = 'Date', y = 'Positive Test Rate') +
+    transition_time(Date) +
+    ease_aes('linear')
+   
+    animate(myPlot, duration = 5, fps = 20, width = 200, height = 200, renderer = gifski_renderer())
+    anim_save("output.gif", path="Result/")
 
 
