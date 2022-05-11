@@ -5,6 +5,7 @@ library(maps)
 library(usdata)
 library(gganimate)
 library(gifski)
+library(gridExtra)
 
 # load CDC vaccine county dataset
 vaccine_file = fread("Data/COVID-19_Vaccinations_in_the_United_States_County.csv")
@@ -53,10 +54,10 @@ positive_test_df = community_transmission %>%
     arrange(Date, Recip_County) %>%
     mutate(FIPS = as.character(FIPS))%>%
     mutate(positive_test_category = cut(positive_rate,
-                                  breaks = c(-Inf, 5, 10, 15, 20, Inf),
+                                  breaks = c(-Inf, 5, 10, 15, 20, 25, Inf),
                                   labels = c("0%-4.9%", "5%-9.9%",
                                              "10%-14.9%", "15%-19.9%",
-                                             "20%-100%")))
+                                             "20%-24.99%", "25%-100%")))
 
 # time series for each positive test category rate
 positive_test_time = positive_test_df %>%
@@ -89,6 +90,21 @@ fig_vaccine_category_rate = ggplot(data = vaccine_time,
 ggsave("Result/vaccine_category_rate.jpg", fig_vaccine_category_rate, height=4,width=8,scale=1.65)
 
 
+# plot the vaccine category rate column
+fig_vaccine_category_rate_col = ggplot(data = vaccine_time,
+                                             aes(x = Date,
+                                                 y = vaccine_category_rate,
+                                                 fill = vaccine_category)) +
+    geom_col()+
+    labs(title = "Vaccine Category Rate")+
+    scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))
+
+ggsave("Result/vaccine_category_rate_col.jpg",
+       fig_vaccine_category_rate_col,
+       height=4,width=8,scale=1.65)
+
+
+
 # plot the positive test category rate
 fig_positive_test_category_rate = ggplot(data = positive_test_time,
                                    aes(x = Date,
@@ -103,7 +119,22 @@ fig_positive_test_category_rate = ggplot(data = positive_test_time,
 
 ggsave("Result/positive_test_category_rate.jpg", fig_positive_test_category_rate, height=4,width=8,scale=1.65)
 
-c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027')
+
+
+# plot the positive test category rate column
+fig_positive_test_category_rate_col = ggplot(data = positive_test_time,
+                                         aes(x = Date,
+                                             y = positive_test_category_rate,
+                                             fill = positive_test_category)) +
+    geom_col()+
+    labs(title = "Positive Test Category Rate")+
+    scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))
+
+ggsave("Result/positive_test_category_rate_col.jpg",
+       fig_positive_test_category_rate_col,
+       height=4,width=8,scale=1.65)
+
+
 
 # USA map with vaccine rate category
 us_county = map_data("county")
@@ -144,8 +175,13 @@ fig_vaccine_map = ggplot(data = county_vaccine_map,
 
 ggsave("Result/vaccine_county_2022-04-30.jpg", fig_vaccine_map, height=4,width=8,scale=1.65)
 
-
-
+# faccet wrap to compare
+fig_compare_vaccine_positive_col = grid.arrange(fig_positive_test_category_rate_col,
+                                                fig_vaccine_category_rate_col,
+                                          nrow = 2)
+ggsave("Result/fig_compare_vaccine_positive_col.jpg",
+       fig_compare_vaccine_positive_col, 
+       height=4,width=8,scale=1.65)
 
 # 
 # library(gapminder)
