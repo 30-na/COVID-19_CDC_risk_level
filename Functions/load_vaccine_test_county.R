@@ -221,18 +221,49 @@ ggsave("Result/fig_compare_vaccine_positive_col.jpg",
 # ?anim_save
 
 # plot the positive test category rate column
-myPlot = ggplot(data = positive_test_time,
-                                             aes(x = Date,
-                                                 y = positive_test_category_rate,
-                                                 fill = positive_test_category)) +
+# myPlot = ggplot(data = positive_test_time,
+#                                              aes(x = Date,
+#                                                  y = positive_test_category_rate,
+#                                                  fill = positive_test_category)) +
+#     geom_col()+
+#     labs(title = "Positive Test Category Rate")+
+#     scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))+
+#     labs(title = 'Date: {frame_time}', x = 'Date', y = 'Positive Test Rate') +
+#     transition_time(Date) +
+#     ease_aes('linear')
+#    
+#     animate(myPlot, duration = 5, fps = 20, width = 200, height = 200, renderer = gifski_renderer())
+#     anim_save("output.gif", path="Result/")
+
+#Texas Vaccination rate
+# plot the vaccine category rate column
+vaccine_time_texas = vaccine_df %>%
+    filter(Recip_State == "TX") %>%
+    group_by(Date) %>%
+    arrange(Date, vaccine_category) %>%
+    count(vaccine_category, .drop=FALSE) %>%
+    rename("count_county" = "n")%>%
+    filter(!is.na(vaccine_category))%>%
+    mutate(sum_county = sum(count_county)) %>%
+    mutate(vaccine_category_rate = round(count_county / sum_county, 2))
+    
+
+
+
+vaccine_time_texas_r = vaccine_df %>%
+    filter(Recip_State == "TX") %>%
+    arrange(Date, vaccine_category)
+    
+fig_vaccine_category_rate_col_Texas = ggplot(data = vaccine_time_texas,
+                                       aes(x = Date,
+                                           y = vaccine_category_rate,
+                                           fill = vaccine_category)) +
     geom_col()+
-    labs(title = "Positive Test Category Rate")+
-    scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))+
-    labs(title = 'Date: {frame_time}', x = 'Date', y = 'Positive Test Rate') +
-    transition_time(Date) +
-    ease_aes('linear')
-   
-    animate(myPlot, duration = 5, fps = 20, width = 200, height = 200, renderer = gifski_renderer())
-    anim_save("output.gif", path="Result/")
+    labs(title = "Vaccine Category Rate in Texas")+
+    scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))
+
+ggsave("Result/vaccine_category_rate_col_Texas.jpg",
+       fig_vaccine_category_rate_col_Texas,
+       height=4,width=8,scale=1.65)
 
 
