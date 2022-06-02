@@ -14,6 +14,7 @@ Datasets:
 6. [United States COVID-19 Community Levels by County as Originally Posted](https://data.cdc.gov/Public-Health-Surveillance/United-States-COVID-19-Community-Levels-by-County-/3nnm-4jni)
 7. [USA Counties](https://hub.arcgis.com/datasets/esri::usa-counties/about)
 8. [COVID-19 Vaccinations in the United States,County](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh)
+9. [COVID-19 Nursing Home Data reported by nursing homes to the CDC’s National Healthcare Safety Network (NHSN)](https://data.cms.gov/covid-19/covid-19-nursing-home-data)
 -----------
 Features:
 
