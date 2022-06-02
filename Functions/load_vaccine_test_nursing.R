@@ -25,16 +25,23 @@ names(nurse_file)
 
 # clean Dataset
 nurse_df = nurse_file %>%
-    select(Week_Ending,
-           Provider_State,
-           County,
-           Number_of_Residents_with_a_New_Positive_COVID19_Test_Result_with_Positive_NAAT_PCR_Test_Only,
-           ) %>%
-  rename("date" = Week_Ending,
-         "state" = Provider_State,
-         "county" = County,
-         "positive_test" = Number_of_Residents_with_a_New_Positive_COVID19_Test_Result_with_Positive_NAAT_PCR_Test_Only)
-           
+    select("Week Ending",
+           "Provider State",
+           "County",
+           "Passed Quality Assurance Check",
+           "Weekly Resident Confirmed COVID-19 Cases Per 1,000 Residents",
+           "Weekly Resident COVID-19 Deaths Per 1,000 Residents",
+           "Number of Residents with a New Positive COVID-19 Test Result with Positive NAAT (PCR) Test Only",
+           "Percentage of Current Residents who Received a Completed COVID-19 Vaccination at Any Time") %>%
+  rename(date = "Week Ending",
+         state = "Provider State",
+         county = "County",
+         quality_check = "Passed Quality Assurance Check",
+         confirmCase_per1000 = "Weekly Resident Confirmed COVID-19 Cases Per 1,000 Residents",
+         deaths_per1000 = "Weekly Resident COVID-19 Deaths Per 1,000 Residents",
+         positiveTest_NAAT = "Number of Residents with a New Positive COVID-19 Test Result with Positive NAAT (PCR) Test Only",
+         vaccineRate = "Percentage of Current Residents who Received a Completed COVID-19 Vaccination at Any Time")
+
            
     mutate(Date = as.Date(Date, format = "%m/%d/%Y"))%>%
     filter(Date > "2021-01-01")
