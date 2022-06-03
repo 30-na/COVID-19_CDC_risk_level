@@ -143,7 +143,6 @@ positiveTest_rate_time = nurse_df %>%
                                       labels = c("0%-0.9%", "1%-1.9%",
                                                  "2%-2.9%", "3%-3.9%",
                                                  "4%-4.9%", "5%-100%")))
-
 ##### counties positive test rate ####
 counties_positiveRate = positiveTest_rate_time %>%
   group_by(date) %>%
