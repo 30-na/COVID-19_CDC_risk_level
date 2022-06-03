@@ -130,34 +130,39 @@ ggsave("Result/available_nursing_data_county_map.jpg", county_map, height=4,widt
 
 
 ##### percentage of positive test rate in total test ####
-positiveTest_rate = nurse_df %>%
+positiveTest_rate_time = nurse_df %>%
   mutate(totalTest = pointOfCare_test + NonePointOfCare_test) %>%
-  mutate(positiveTest_rate = (positiveTest / totalTest) * 100) %>%
+  mutate(totalTest = ifelse(totalTest < positiveTest, NA, totalTest)) %>%
+  drop_na(totalTest, positiveTest) %>%
+  group_by(date, state_county) %>%
+  summarize(county_positivTest = sum(positiveTest),
+            county_totalTest = sum(totalTest)) %>%
+  mutate(positiveTest_rate = (county_positivTest / county_totalTest) * 100) %>%
   mutate(positive_test_category = cut(positiveTest_rate,
-                                      breaks = c(-Inf, 5, 10, 15, 20, 25, 100),
+                                      breaks = c(-Inf, 1, 2, 3, 4, 5, 100),
                                       labels = c("0%-4.9%", "5%-9.9%",
                                                  "10%-14.9%", "15%-19.9%",
                                                  "20%-24.99%", "25%-100%"))) %>%
   group_by(date) %>%
-  arrange(date, positive_test_category)
-  count(positive_test_category, .drop=FALSE) 
+  arrange(date, state_county) 
+  count(positive_test_category, .drop=FALSE) %>%
   rename("count_county" = "n") %>%
-  filter(!is.na(positive_test_category))%>%
+  filter(!is.na(positive_test_category)) %>%
   mutate(sum_county = sum(count_county)) %>%
   mutate(positive_test_category_rate = round(count_county / sum_county, 2))
-length(unique(nurse_df$state_county))
+
 
 
 # plot the positive test category rate column
-fig_positive_test_category_rate_col = ggplot(data = positive_test_time,
-                                             aes(x = Date,
+fig_positive_test_category_rate_col = ggplot(data = positiveTest_rate_time,
+                                             aes(x = date,
                                                  y = positive_test_category_rate,
                                                  fill = positive_test_category)) +
   geom_col()+
   labs(title = "Positive Test Category Rate")+
   scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))
 
-ggsave("Result/positive_test_category_rate_col.jpg",
+ggsave("Result/positive_test_category_rate_nursing_col.jpg",
        fig_positive_test_category_rate_col,
        height=4,width=8,scale=1.65)
 
