@@ -140,30 +140,49 @@ positiveTest_rate_time = nurse_df %>%
   mutate(positiveTest_rate = (county_positivTest / county_totalTest) * 100) %>%
   mutate(positive_test_category = cut(positiveTest_rate,
                                       breaks = c(-Inf, 1, 2, 3, 4, 5, 100),
-                                      labels = c("0%-4.9%", "5%-9.9%",
-                                                 "10%-14.9%", "15%-19.9%",
-                                                 "20%-24.99%", "25%-100%"))) %>%
+                                      labels = c("0%-0.9%", "1%-1.9%",
+                                                 "2%-2.9%", "3%-3.9%",
+                                                 "4%-4.9%", "5%-100%")))
+
+##### counties positive test rate ####
+counties_positiveRate = positiveTest_rate_time %>%
   group_by(date) %>%
-  arrange(date, state_county) 
+  arrange(date, state_county) %>%
   count(positive_test_category, .drop=FALSE) %>%
   rename("count_county" = "n") %>%
   filter(!is.na(positive_test_category)) %>%
   mutate(sum_county = sum(count_county)) %>%
-  mutate(positive_test_category_rate = round(count_county / sum_county, 2))
+  mutate(counties_positive_test_rate = round(count_county / sum_county, 2))
 
 
 
 # plot the positive test category rate column
-fig_positive_test_category_rate_col = ggplot(data = positiveTest_rate_time,
+fig_positive_test_category_rate_col = ggplot(data = counties_positiveRate,
                                              aes(x = date,
-                                                 y = positive_test_category_rate,
+                                                 y = counties_positive_test_rate,
                                                  fill = positive_test_category)) +
   geom_col()+
-  labs(title = "Positive Test Category Rate")+
-  scale_fill_manual(values=c('#f0f9e8','#ccebc5','#a8ddb5','#7bccc4','#43a2ca','#0868ac'))
+  labs(title = "Proportion of counties with different positive test Rate")+
+  scale_fill_manual(values=c('#ffffb2','#fed976','#feb24c','#fd8d3c','#f03b20','#bd0026'))
 
-ggsave("Result/positive_test_category_rate_nursing_col.jpg",
+ggsave("Result/counties_positive_test_category_rate_nursing_col.jpg",
        fig_positive_test_category_rate_col,
+       height=4,width=8,scale=1.65)
+
+
+
+# density positive rate
+positiveTest_rate_time_na = positiveTest_rate_time %>%
+  drop_na(positive_test_category)
+fig_vaccine_category_rate_dens = ggplot(data = positiveTest_rate_time_na,
+                                        aes(date,
+                                            fill = positive_test_category)) +
+    geom_density(position = "stack", alpha = .8) +
+    scale_fill_brewer(palette = "Reds") +
+    labs(title = "Positive Test Category Density")
+
+ggsave("Result/fig_vaccine_category_rate_dens.jpg",
+       fig_vaccine_category_rate_dens,
        height=4,width=8,scale=1.65)
 
 
