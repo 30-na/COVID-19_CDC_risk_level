@@ -225,19 +225,6 @@ ggsave("Result/counties_death_category_rate_nursing_col.jpg",
 
 
 
-
-
-
-
-
-
-
- 
-
-
-
-
-
 ##### counties vaccine Rate ####
 counties_vaccineRate = nurse_categoryRate %>%
   group_by(date) %>%
@@ -260,3 +247,157 @@ fig_vaccine_category_rate_col = ggplot(data = counties_vaccineRate,
 ggsave("Result/counties_vaccine_category_rate_nursing_col.jpg",
        fig_vaccine_category_rate_col,
        height=4,width=8,scale=1.65)
+
+
+
+##### positive rate category ####
+
+positiveRate_time = nurse_categoryRate %>%
+  drop_na(positiveRate_category) %>%
+  group_by(date) %>%
+  count(positiveRate_category, .drop = FALSE) %>%
+  rename("count_county" = "n")
+
+fig_positiveRate_category = ggplot(data = positiveRate_time,
+                                         aes(x = date,
+                                             y = count_county,
+                                             color = positiveRate_category)) +
+  geom_line(size = 1.5)+
+  # geom_area(aes(color = positiveRate_category, fill = positiveRate_category), 
+  #           alpha = 0.05, position = position_dodge(0.8)) +
+  geom_point(size = 3, alpha=.2)+
+  labs(title = "Positive Rate Category")+
+  scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027'))+
+  theme_minimal()
+
+ggsave("Result/positiveRate_category_rate.jpg",
+       fig_positiveRate_category, height=4,width=8,scale=1.65)
+
+
+
+
+
+##### Death rate category ####
+
+deathRate_time = nurse_categoryRate %>%
+  drop_na(deathRate_category) %>%
+  group_by(date) %>%
+  count(deathRate_category, .drop = FALSE) %>%
+  rename("count_county" = "n")
+
+fig_deathRate_category = ggplot(data = deathRate_time,
+                                   aes(x = date,
+                                       y = count_county,
+                                       color = deathRate_category)) +
+  geom_line(size = 1.5)+
+  geom_point(size = 3, alpha=.2)+
+  labs(title = "Death Rate Category")+
+  scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027'))+
+theme_minimal()
+
+ggsave("Result/deathRate_category_rate.jpg",
+       fig_deathRate_category, height=4,width=8,scale=1.65)
+
+
+
+##### Vaccine rate category ####
+
+vaccineRate_time = nurse_categoryRate %>%
+  drop_na(vaccineRate_category) %>%
+  group_by(date) %>%
+  count(vaccineRate_category, .drop = FALSE) %>%
+  rename("count_county" = "n")
+
+fig_vaccineRate_category = ggplot(data = vaccineRate_time,
+                                aes(x = date,
+                                    y = count_county,
+                                    color = vaccineRate_category)) +
+  geom_line(size = 1.5)+
+  geom_point(size = 3, alpha=.2)+
+  labs(title = "Vaccine Rate Category")+
+  scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027'))+
+  theme_minimal()
+
+ggsave("Result/vaccineRate_category_rate.jpg",
+       fig_vaccineRate_category, height=4,width=8,scale=1.65)
+
+fig_mix = grid.arrange(fig_positive_test_category_rate_col,
+                       fig_death_category_rate_col,
+                       nrow = 2)
+
+ggsave("Result/mixed.jpg",
+       fig_mix, height=4,width=8,scale=1.65)
+
+fig_mix1 = grid.arrange(fig_positiveRate_category,
+                       fig_deathRate_category,
+                       nrow = 2)
+
+ggsave("Result/mixed1.jpg",
+       fig_mix1, height=4,width=8,scale=1.65)
+
+
+a =select(nurse_file, "Number of Residents Staying in this Facility for At Least 1 Day This Week")
+unique(a)
+
+Positive Antigen Tests Only: Number of Residents
+Not Vaccinated with COVID-19 Vaccine Before
+Positive Test
+Positive Antigen Tests Only: Number of Residents
+who Received Pfizer-BioNTech COVID-19 Vaccine
+Dose 1 Only Before Positive Test
+Positive Antigen Tests Only: Number of Residents
+who Received Pfizer-BioNTech COVID-19 Vaccine
+Doses 1 and 2 Before Positive Test
+
+Positive Antigen Tests Only: Number of Residents
+who Received Complete Unspecified COVID-19
+Vaccine Before Positive Test
+Any Other Combination of Antigen Test and/or
+
+AAT (PCR) Test with At Least One Positive Test:
+  Number of Residents Not Vaccinated with COVID-19
+
+Vaccine Before Positive Test
+Any Other Combination of Antigen Test and/or
+
+NAAT (PCR) Test with At Least One Positive Test:
+  Number of Residents who Received Complete
+
+Unspecified COVID-19 Vaccine Before Positive Test
+Any Other Combination of Antigen Test and/or
+
+NAAT (PCR) Test with At Least One Positive Test:
+  Number of Residents who Received Partial
+
+Unspecified COVID-19 Vaccine Before Positive Test
+Any Other Combination of Antigen Test and/or
+
+NAAT (PCR) Test with At Least One Positive Test:
+  COVID-19 Vaccine Booster Received 14 days or
+More Before the Specimen Collection Date
+
+Number of Residents Staying in this Facility for At
+Least 1 Day This Week
+
+Percentage of Current Residents who Received a
+
+Completed COVID-19 Vaccination at Any Time
+Percentage of Current Residents who Received a
+
+Partial COVID-19 Vaccination at Any Time
+
+Percentage of Current Healthcare Personnel who
+Received a Completed COVID-19 Vaccination at Any
+Time
+
+Percentage of Current Healthcare Personnel who
+Received a Partial COVID-19 Vaccination at Any
+Time
+
+Percentage of Current Residents with a Completed
+Vaccination who Received a COVID-19 Vaccine
+Booster at Any Time
+
+Percentage of Current Healthcare Personnel with a
+Completed Vaccination who Received a COVID-19
+Vaccine Booster at Any Time
