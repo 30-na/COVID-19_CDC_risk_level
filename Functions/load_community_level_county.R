@@ -31,7 +31,8 @@ CDC_community_level_county = CDC_risk_new %>%
     arrange(date_updated, state, county_fips) 
 
 
-save(CDC_community_level_county, file="Data/CDC_community_level_county.csv") 
+save(CDC_community_level_county,
+     file="Data/CDC_community_level_county.csv") 
 
 
 
