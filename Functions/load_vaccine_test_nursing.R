@@ -172,6 +172,9 @@ nurse_categoryRate = nurse_df %>%
                                              "80%-84.9%", "85%-89.9%",
                                              "90%-94.9%", "95%-100%")))
  
+save(nurse_categoryRate, 
+     file="Data/nurse_categoryRate.csv")
+
 
 ##### counties positiveTest rate ####
 counties_positiveRate = nurse_categoryRate %>%
