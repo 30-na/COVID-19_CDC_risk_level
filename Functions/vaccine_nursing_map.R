@@ -4,7 +4,8 @@ library(ggplot2)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(shiny)
-
+library(dplyr)
+library(lubridate)
 
 load("Data/nurse_categoryRate.csv")
 
@@ -24,7 +25,11 @@ counties_list = counties(cb = TRUE,
     mutate(state_county = tolower(paste(STATE_NAME, NAME, sep = ","))) %>%
     left_join(nurse_deathRate,
                by = "state_county")
-    
+    # mutate(date1 = format(date, "%d-%b-%Y")) %>%
+    # drop_na()
+
+
+
 states_list = states(cb = TRUE,
                      resolution = "500k") %>%
     shift_geometry() %>%
@@ -32,10 +37,12 @@ states_list = states(cb = TRUE,
 
 counties_list_shifted = counties_list %>%
     filter(date == "2022-04-03")
+
 g = ggplot() +
     geom_sf(data = counties_list,
             size = .2,
             aes(fill = county_deathRate)) +
+    
     geom_sf(data = states_list,
                 color = "black",
                 fill = NA,
@@ -48,9 +55,41 @@ g = ggplot() +
         na.value = "grey",
         guide = "colourbar",
         aesthetics = "fill"
-    )
+    ) +
+    transition_manual(date) + 
+    ggtitle("Death Rate in nurse homes in county level ")
+
+anim_p2 = animate(g, fps = 8,
+                  start_pause = 1,
+                  end_pause = 15,
+                  detail = 2,
+                  rewind = FALSE,
+                  width = 720,
+                  height = 720,
+                  res = 140,
+                  renderer = gifski_renderer())
+anim_save(filename = "covid_aus_cases_EMA_aug30_.gif",
+          animation = g)
+plot(g)
 
 
+# save as a GIF
+animate(nations_plot,
+        fps = 10,
+        width = 750,
+        height = 450)
+anim_save("nations.gif")
+
+# save as a video
+animate(g,
+        renderer = ffmpeg_renderer(),
+        width = 800,
+        height = 800)
+anim_save("Covid.mp4")
+
+
+
+########################################################
 map_with_animation <- g +
     transition_time(date) +
     ggtitle('date: {frame_time}',
