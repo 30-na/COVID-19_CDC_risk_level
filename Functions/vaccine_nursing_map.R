@@ -1,11 +1,15 @@
 library(sf)
 library(tigris)
 library(ggplot2)
+library(gganimate)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(shiny)
 library(dplyr)
 library(lubridate)
+library(tidyr)
+library(ggthemes)
+install.packages("ggthemes")
 
 load("Data/nurse_categoryRate.csv")
 
@@ -15,20 +19,42 @@ nurse_deathRate = nurse_categoryRate %>%
                   state_county, 
                   county_deathRate)
     
+nurse_vaccineRate = nurse_categoryRate %>%
+    drop_na(county_vaccineRate) %>%
+    dplyr::select(date,
+                  state_county, 
+                  county_vaccineRate)
+
+nurse_positiveRate = nurse_categoryRate %>%
+    drop_na(county_positiveRate) %>%
+    dplyr::select(date,
+                  state_county, 
+                  county_positiveRate)
 
 options(tigris_use_cache = TRUE)
 
-counties_list = counties(cb = TRUE,
+counties_list_tigris = counties(cb = TRUE,
                          resolution = "500k") %>%
     shift_geometry() %>%
     dplyr::filter(as.numeric(STATEFP) %in% 1:56) %>%
     mutate(state_county = tolower(paste(STATE_NAME, NAME, sep = ","))) %>%
-    left_join(nurse_deathRate,
-               by = "state_county")
-    # mutate(date1 = format(date, "%d-%b-%Y")) %>%
-    # drop_na()
+    select(state_county)
+
+mereged_date_counties = merge(counties_list_tigris,
+                              unique(nurse_categoryRate$date)) %>%
+    rename(date = y)
 
 
+    
+    
+
+
+counties_list = mereged_date_counties %>%
+    left_join(nurse_deathRate, by = c("state_county", "date"))
+    # filter(date >='2021-06-13' & date <= '2021-07-04') 
+     # mutate(date1 = as.numeric(format(date, "%Y.%m"))) %>%
+     # drop_na()
+hist(nurse_categoryRate$county_deathRate)
 
 states_list = states(cb = TRUE,
                      resolution = "500k") %>%
@@ -38,7 +64,7 @@ states_list = states(cb = TRUE,
 counties_list_shifted = counties_list %>%
     filter(date == "2022-04-03")
 
-g = ggplot() +
+g = ggplot(data = counties_list) +
     geom_sf(data = counties_list,
             size = .2,
             aes(fill = county_deathRate)) +
@@ -47,48 +73,63 @@ g = ggplot() +
                 color = "black",
                 fill = NA,
                 size = .3) +
-    #scale_fill_viridis_c(option = "I",
-                         #direction = 1)+
-    scale_fill_gradientn(colors = c("green", "red"),
-        values = NULL,
+    # scale_fill_viridis_c(option = "I",
+    # direction = 1)+
+    scale_fill_gradient(name = "Death rate",
+                        low = "#78c679",
+                        high = "#f03b20",
         space = "Lab",
         na.value = "grey",
         guide = "colourbar",
-        aesthetics = "fill"
-    ) +
-    transition_manual(date) + 
-    ggtitle("Death Rate in nurse homes in county level ")
+        aesthetics = "fill")+
+    theme_map()+
+    # transition_manual(date) + 
+    # labs(title = "Death Rae in nursing homes in county level",
+    #      subtitle = "Date: {as.integer(frame_time)}") +
+    transition_time(date) +
+    #view_follow(fixed_x=T, fixed_y=T) +
+    labs(title = 'Date: {frame_time}',
+         x = NULL,
+         y = NULL) 
+    #ease_aes('linear')
 
-anim_p2 = animate(g, fps = 8,
+
+
+anim_p2 = animate(g,
+                  fps = 5,
                   start_pause = 1,
-                  end_pause = 15,
-                  detail = 2,
+                  end_pause = 5,
+                  #duration = 5,
+                  detail = 1,
                   rewind = FALSE,
-                  width = 720,
-                  height = 720,
-                  res = 140,
+                  width = 1800,
+                  height = 1800,
+                  res = 300,
                   renderer = gifski_renderer())
-anim_save(filename = "covid_aus_cases_EMA_aug30_.gif",
-          animation = g)
-plot(g)
+
+anim_save(filename = "Result/covid_nurse.gif",
+          animation = anim_p2)
+
+length(unique(counties_list$state_county))
 
 
-# save as a GIF
+# ###########################################################save as a GIF
 animate(nations_plot,
         fps = 10,
         width = 750,
         height = 450)
-anim_save("nations.gif")
+anim_save("Result/nations.gif")
 
 # save as a video
-animate(g,
+b = animate(g,
         renderer = ffmpeg_renderer(),
         width = 800,
         height = 800)
-anim_save("Covid.mp4")
+anim_save("Covid.mp4", b)
 
 
-
+install.packages("animation")
+library(animation)
 ########################################################
 map_with_animation <- g +
     transition_time(date) +
