@@ -40,6 +40,7 @@ nurse_df = nurse_file %>%
            "Total Number of Occupied Beds",
            "Residents Weekly COVID-19 Deaths",
            "Weekly Resident COVID-19 Deaths Per 1,000 Residents",
+           "Number of Residents Staying in this Facility for At Least 1 Day This Week",
            "Number of Residents with a New Positive COVID-19 Test Result",
            "Number of Residents with a New Positive COVID-19 Test Result with Positive NAAT (PCR) Test Only",
            "Percentage of Current Residents who Received a Completed COVID-19 Vaccination at Any Time",
@@ -49,7 +50,7 @@ nurse_df = nurse_file %>%
          state = "Provider State",
          county = "County",
          qualityCheck = "Passed Quality Assurance Check",
-         bedOccupied = "Total Number of Occupied Beds",
+         numResidents = "Number of Residents Staying in this Facility for At Least 1 Day This Week",
          deaths = "Residents Weekly COVID-19 Deaths",
          deaths_per1000 = "Weekly Resident COVID-19 Deaths Per 1,000 Residents",
          positiveTest = "Number of Residents with a New Positive COVID-19 Test Result",
@@ -151,12 +152,12 @@ nurse_categoryRate = nurse_df %>%
   group_by(date, state_county) %>%
   summarize(county_vaccineRate = mean(vaccineRate),
             county_death = sum(deaths),
-            county_bedOccupied = sum(bedOccupied),
+            county_numResidents = sum(numResidents),
             county_positiveTest = sum(positiveTest),
             county_totalTest = sum(totalTest)) %>%
-  mutate(county_deathRate = (county_death / county_bedOccupied) * 100) %>%
-  mutate(county_postiveRate = (county_positiveTest / county_totalTest) * 100) %>%
-  mutate(positiveRate_category = cut(county_postiveRate,
+  mutate(county_deathRate = (county_death / county_numResidents) * 100) %>%
+  mutate(county_positiveRate = (county_positiveTest / county_totalTest) * 100) %>%
+  mutate(positiveRate_category = cut(county_positiveRate,
                                     breaks = c(-Inf, 1, 2, 3, 4, 5, 100),
                                     labels = c("0%-0.9%", "1%-1.9%",
                                                "2%-2.9%", "3%-3.9%",
