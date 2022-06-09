@@ -56,7 +56,7 @@ vaccine_death_point =  ggplot(data = nurse_vaccine_death,
     scale_colour_viridis_d() +
     theme_classic() + 
     transition_time(date) +
-    labs(title = "Daet: {frame_time}") +
+    labs(title = "Date: {frame_time}") +
     view_follow(fixed_y = TRUE,
                 fixed_x = TRUE)
 
@@ -107,7 +107,7 @@ vaccine_positive_point =  ggplot(data = nurse_vaccine_positive,
     scale_colour_viridis_d() +
     theme_classic() + 
     transition_time(date) +
-    labs(title = "Daet: {frame_time}") +
+    labs(title = "Date: {frame_time}") +
     view_follow(fixed_y = TRUE,
                 fixed_x = TRUE)
 
