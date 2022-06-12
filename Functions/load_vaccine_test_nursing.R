@@ -50,7 +50,8 @@ nurse_df = nurse_file %>%
          state = "Provider State",
          county = "County",
          qualityCheck = "Passed Quality Assurance Check",
-         numResidents = "Number of Residents Staying in this Facility for At Least 1 Day This Week",
+         residentNum = "Number of Residents Staying in this Facility for At Least 1 Day This Week",
+         occupied_bed = "Total Number of Occupied Beds",
          deaths = "Residents Weekly COVID-19 Deaths",
          deaths_per1000 = "Weekly Resident COVID-19 Deaths Per 1,000 Residents",
          positiveTest = "Number of Residents with a New Positive COVID-19 Test Result",
@@ -64,6 +65,7 @@ nurse_df = nurse_file %>%
   mutate(state_county = paste(state, county, sep = ",")) %>%
   mutate(state_county = tolower(state_county))
 
+save(nurse_df , file = "Data/nurse_df.csv")
 
 
 ##### map of county with available data #############
@@ -152,10 +154,10 @@ nurse_categoryRate = nurse_df %>%
   group_by(date, state_county) %>%
   summarize(county_vaccineRate = mean(vaccineRate),
             county_death = sum(deaths),
-            county_numResidents = sum(numResidents),
+            county_occupied_bed = sum(occupied_bed),
             county_positiveTest = sum(positiveTest),
             county_totalTest = sum(totalTest)) %>%
-  mutate(county_deathRate = (county_death / county_numResidents) * 100) %>%
+  mutate(county_deathRate = (county_death / county_occupied_bed) * 100) %>%
   mutate(county_positiveRate = (county_positiveTest / county_totalTest) * 100) %>%
   mutate(positiveRate_category = cut(county_positiveRate,
                                     breaks = c(-Inf, 1, 2, 3, 4, 5, 100),
@@ -266,12 +268,12 @@ fig_positiveRate_category = ggplot(data = positiveRate_time,
                                          aes(x = date,
                                              y = count_county,
                                              color = positiveRate_category)) +
-  geom_line(size = 1.5)+
+  geom_line(size = 1.5) +
   # geom_area(aes(color = positiveRate_category, fill = positiveRate_category), 
   #           alpha = 0.05, position = position_dodge(0.8)) +
-  geom_point(size = 3, alpha=.2)+
-  labs(title = "Positive Rate Category")+
-  scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027'))+
+  geom_point(size = 3, alpha=.2) +
+  labs(title = "Positive Rate Category") +
+  scale_color_manual(values=c('#1a9850','#91cf60','#d9ef8b','#fee08b','#fc8d59','#d73027')) +
   theme_minimal()
 
 ggsave("Result/positiveRate_category_rate.jpg",
