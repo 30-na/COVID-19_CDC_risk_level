@@ -132,3 +132,115 @@ anim_save(filename = "Result/anim_vaccine_positive_less25.gif",
 #        vaccine_positive_point,
 #        height=4,width=8,scale=1.65)
 
+###### Death Rate VS POSITIVE TEST #####
+nurse_death_positive = nurse_categoryRate %>%
+    mutate(state = gsub(",.*", "", state_county)) %>%
+    mutate(county = gsub(".*,", "", state_county)) %>%
+    left_join(county_population, by = c("state",
+                                        "county")) %>%
+    mutate(county_positiveRate = ifelse(county_positiveRate > 25, NA, county_positiveRate)) %>%
+    mutate(county_deathRate = ifelse(county_deathRate > 3, NA, county_deathRate)) %>%
+    drop_na(county_positiveRate, 
+            county_deathRate) 
+    
+    # mutate(county_positiveRate = ifelse(county_positiveRate > 25, NA, county_positiveRate)) %>%
+
+
+
+# plot geom point
+death_positive_point =  ggplot(data = nurse_death_positive,
+                                 aes(x = county_positiveRate,
+                                     y = county_deathRate,
+                                     size = population,
+                                     color = state)) +
+    geom_point(show.legend = FALSE,
+               alpha = 0.7) +
+    scale_colour_viridis_d() +
+    theme_classic() + 
+    transition_time(date) +
+    labs(title = "Date: {frame_time}") +
+    view_follow(fixed_y = TRUE,
+                fixed_x = TRUE)
+
+
+
+anim_death_positive = animate(death_positive_point,
+                                #fps = 4,
+                                start_pause = 1,
+                                end_pause = 5,
+                                duration = 20,
+                                detail = 1,
+                                rewind = FALSE,
+                                width = 1800,
+                                height = 1800,
+                                res = 300,
+                                renderer = gifski_renderer())
+
+anim_save(filename = "Result/anim_death_positive.gif",
+          animation = anim_death_positive)
+
+
+
+library(data.table)
+library(sf)
+library(usdata)
+state_map = get_acs(geography = "state",
+                    variable = "B04004_001",
+                    geometry = TRUE)
+
+vaccine_state_file = fread("Data/COVID-19_Vaccinations_in_the_United_States_Jurisdiction.csv")
+
+
+vaccine_state = vaccine_state_file %>%
+    select(Date,
+           Location,
+           Series_Complete_Pop_Pct) %>%
+    rename("date" = Date,
+           "NAME" = Location,
+           "vaccine_pct" = Series_Complete_Pop_Pct) %>%
+    mutate(date = as.Date(date, format = ))
+    mutate(NAME = abbr2state(NAME)) %>%
+    na.omit() %>%
+    left_join(state_map, by = "NAME") 
+
+
+    vaccine_state_map = ggplot(data = vaccine_state) + 
+    geom_sf(aes(fill = vaccine_pct)) + 
+    # Code below is just minor visual editing, not necessary for the map to run!
+    ggthemes::theme_map() + 
+    theme(legend.position = "right") + 
+    scale_fill_gradient2(name = "Vaccination rate", 
+                         low = "white", 
+                         high = "orange",
+                         labels = scales::percent)+
+    transition_time(date) +
+    #view_follow(fixed_x=T, fixed_y=T) +
+    labs(title = 'Date: {frame_time}',
+         x = NULL,
+         y = NULL) 
+#ease_aes('linear')
+
+
+
+anim_p1 = animate(vaccine_state,
+                  #fps = 4,
+                  start_pause = 1,
+                  end_pause = 5,
+                  duration = 10,
+                  detail = 1,
+                  rewind = FALSE,
+                  width = 900,
+                  height = 900,
+                  res = 150,
+                  renderer = gifski_renderer())
+
+anim_save(filename = "Result/state_vaccine.gif",
+          animation = anim_p1)
+
+
+
+
+# ggsave("Result/death_positive_point.jpg",
+#        death_positive_point,
+#        height=4,width=8,scale=1.65)
+
