@@ -50,9 +50,8 @@ mortality_state_map = ggplot(data = nurse_geo_state) +
                          labels = scales::percent) +
     transition_time(date) +
     #view_follow(fixed_x=T, fixed_y=T) +
-    labs(title = 'Date: {frame_time}') 
-#ease_aes('linear')
- 
+    labs(title = 'Date: {frame_time}') +
+    ease_aes('cubic-in-out') 
 
 anim_p1 = animate(mortality_state_map,
                   #fps = 4,
