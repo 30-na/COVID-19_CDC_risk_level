@@ -33,7 +33,7 @@ names(nurse_file)
 
 
 nurse_df = nurse_file %>%
-    select("Week Ending",
+    dplyr::select("Week Ending",
            "Provider State",
            "County",
            "Passed Quality Assurance Check",
@@ -45,20 +45,30 @@ nurse_df = nurse_file %>%
            "Number of Residents with a New Positive COVID-19 Test Result with Positive NAAT (PCR) Test Only",
            "Percentage of Current Residents who Received a Completed COVID-19 Vaccination at Any Time",
            "COVID-19 Non-Point-of-Care Tests Performed on Residents Since Last Report",
-           "COVID-19 Point-of-Care Tests Performed on Residents Since Last Report") %>%
+           "COVID-19 Point-of-Care Tests Performed on Residents Since Last Report",
+           "Shortage of Nursing Staff",
+           "Number of All Beds",
+           "Percentage of Current Healthcare Personnel who Received a Completed COVID-19 Vaccination at Any Time",
+           "Percentage of Current Residents with a Completed Vaccination who Received a COVID-19 Vaccine Booster at Any Time",
+           "Percentage of Current Healthcare Personnel with a Completed Vaccination who Received a COVID-19 Vaccine Booster at Any Time") %>%
   rename(date = "Week Ending",
          state = "Provider State",
          county = "County",
          qualityCheck = "Passed Quality Assurance Check",
          residentNum = "Number of Residents Staying in this Facility for At Least 1 Day This Week",
          occupied_bed = "Total Number of Occupied Beds",
+         total_bed = "Number of All Beds",
          deaths = "Residents Weekly COVID-19 Deaths",
          deaths_per1000 = "Weekly Resident COVID-19 Deaths Per 1,000 Residents",
          positiveTest = "Number of Residents with a New Positive COVID-19 Test Result",
          positiveTest_NAAT = "Number of Residents with a New Positive COVID-19 Test Result with Positive NAAT (PCR) Test Only",
-         vaccineRate = "Percentage of Current Residents who Received a Completed COVID-19 Vaccination at Any Time",
+         resident_vaccineRate = "Percentage of Current Residents who Received a Completed COVID-19 Vaccination at Any Time",
+         personnel_vaccineRate = "Percentage of Current Healthcare Personnel who Received a Completed COVID-19 Vaccination at Any Time",
          NonePointOfCare_test = "COVID-19 Non-Point-of-Care Tests Performed on Residents Since Last Report",
-         pointOfCare_test = "COVID-19 Point-of-Care Tests Performed on Residents Since Last Report") %>%
+         resident_vaccineRate_boost = "Percentage of Current Residents with a Completed Vaccination who Received a COVID-19 Vaccine Booster at Any Time",
+         personnel_vaccineRate_boost = "Percentage of Current Healthcare Personnel with a Completed Vaccination who Received a COVID-19 Vaccine Booster at Any Time",
+         pointOfCare_test = "COVID-19 Point-of-Care Tests Performed on Residents Since Last Report",
+         nurse_shortage = "Shortage of Nursing Staff") %>%
   mutate(date = as.Date(date, format = "%m/%d/%y")) %>%
   dplyr::filter(qualityCheck == "Y")  %>%
   mutate(state = abbr2state(state)) %>%
@@ -341,69 +351,70 @@ fig_mix1 = grid.arrange(fig_positiveRate_category,
 ggsave("Result/mixed1.jpg",
        fig_mix1, height=4,width=8,scale=1.65)
 
+# 
+# a =select(nurse_file, "Number of Residents Staying in this Facility for At Least 1 Day This Week")
+# unique(a)
+# 
+# Positive Antigen Tests Only: Number of Residents
+# Not Vaccinated with COVID-19 Vaccine Before
+# Positive Test
+# Positive Antigen Tests Only: Number of Residents
+# who Received Pfizer-BioNTech COVID-19 Vaccine
+# Dose 1 Only Before Positive Test
+# Positive Antigen Tests Only: Number of Residents
+# who Received Pfizer-BioNTech COVID-19 Vaccine
+# Doses 1 and 2 Before Positive Test
+# 
+# Positive Antigen Tests Only: Number of Residents
+# who Received Complete Unspecified COVID-19
+# Vaccine Before Positive Test
+# Any Other Combination of Antigen Test and/or
+# 
+# AAT (PCR) Test with At Least One Positive Test:
+#   Number of Residents Not Vaccinated with COVID-19
+# 
+# Vaccine Before Positive Test
+# Any Other Combination of Antigen Test and/or
+# 
+# NAAT (PCR) Test with At Least One Positive Test:
+#   Number of Residents who Received Complete
+# 
+# Unspecified COVID-19 Vaccine Before Positive Test
+# Any Other Combination of Antigen Test and/or
+# 
+# NAAT (PCR) Test with At Least One Positive Test:
+#   Number of Residents who Received Partial
+# 
+# Unspecified COVID-19 Vaccine Before Positive Test
+# Any Other Combination of Antigen Test and/or
+# 
+# NAAT (PCR) Test with At Least One Positive Test:
+#   COVID-19 Vaccine Booster Received 14 days or
+# More Before the Specimen Collection Date
+# 
+# Number of Residents Staying in this Facility for At
+# Least 1 Day This Week
+# 
+# Percentage of Current Residents who Received a
+# 
+# Completed COVID-19 Vaccination at Any Time
+# Percentage of Current Residents who Received a
+# 
+# Partial COVID-19 Vaccination at Any Time
+# 
+# Percentage of Current Healthcare Personnel who
+# Received a Completed COVID-19 Vaccination at Any
+# Time
+# 
+# Percentage of Current Healthcare Personnel who
+# Received a Partial COVID-19 Vaccination at Any
+# Time
+# 
+# Percentage of Current Residents with a Completed
+# Vaccination who Received a COVID-19 Vaccine
+# Booster at Any Time
+# 
+# Percentage of Current Healthcare Personnel with a
+# Completed Vaccination who Received a COVID-19
+# Vaccine Booster at Any Time
 
-a =select(nurse_file, "Number of Residents Staying in this Facility for At Least 1 Day This Week")
-unique(a)
-
-Positive Antigen Tests Only: Number of Residents
-Not Vaccinated with COVID-19 Vaccine Before
-Positive Test
-Positive Antigen Tests Only: Number of Residents
-who Received Pfizer-BioNTech COVID-19 Vaccine
-Dose 1 Only Before Positive Test
-Positive Antigen Tests Only: Number of Residents
-who Received Pfizer-BioNTech COVID-19 Vaccine
-Doses 1 and 2 Before Positive Test
-
-Positive Antigen Tests Only: Number of Residents
-who Received Complete Unspecified COVID-19
-Vaccine Before Positive Test
-Any Other Combination of Antigen Test and/or
-
-AAT (PCR) Test with At Least One Positive Test:
-  Number of Residents Not Vaccinated with COVID-19
-
-Vaccine Before Positive Test
-Any Other Combination of Antigen Test and/or
-
-NAAT (PCR) Test with At Least One Positive Test:
-  Number of Residents who Received Complete
-
-Unspecified COVID-19 Vaccine Before Positive Test
-Any Other Combination of Antigen Test and/or
-
-NAAT (PCR) Test with At Least One Positive Test:
-  Number of Residents who Received Partial
-
-Unspecified COVID-19 Vaccine Before Positive Test
-Any Other Combination of Antigen Test and/or
-
-NAAT (PCR) Test with At Least One Positive Test:
-  COVID-19 Vaccine Booster Received 14 days or
-More Before the Specimen Collection Date
-
-Number of Residents Staying in this Facility for At
-Least 1 Day This Week
-
-Percentage of Current Residents who Received a
-
-Completed COVID-19 Vaccination at Any Time
-Percentage of Current Residents who Received a
-
-Partial COVID-19 Vaccination at Any Time
-
-Percentage of Current Healthcare Personnel who
-Received a Completed COVID-19 Vaccination at Any
-Time
-
-Percentage of Current Healthcare Personnel who
-Received a Partial COVID-19 Vaccination at Any
-Time
-
-Percentage of Current Residents with a Completed
-Vaccination who Received a COVID-19 Vaccine
-Booster at Any Time
-
-Percentage of Current Healthcare Personnel with a
-Completed Vaccination who Received a COVID-19
-Vaccine Booster at Any Time
