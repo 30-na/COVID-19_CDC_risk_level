@@ -1,0 +1,362 @@
+---
+title: "Covid-19 Nursing home Mortality rate"
+author: "Sina Mokhtar"
+date: '2022-06-21'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## load libraries
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(usdata)
+```
+
+
+## load nursery home datasets
+
+```{r}
+load( "Data/nurse_df.csv")
+```
+
+
+## Top 5 state with cumulative mortality rate
+
+```{r}
+# summerize data to state level and filter top 5 state with cumulative mortality rate
+# (after "2021-06-30")
+# Note: mortality rate = death / occupied bed
+nurse_state_cum_top5_list = nurse_df %>%
+    drop_na(state) %>%
+    group_by(date, state) %>%
+    summarize(deaths = sum(deaths, na.rm = TRUE),
+              occupied_bed = sum(occupied_bed, na.rm = TRUE)) %>%
+    mutate(mortalityRate = (deaths / occupied_bed) ) %>%
+    mutate(state_ab = state2abbr(state)) %>%
+    dplyr::filter(date >= "2021-06-30") %>%
+    group_by(state) %>%
+    mutate(mortalityRate_cum = cumsum(mortalityRate)) %>%
+    group_by(state) %>%
+    dplyr::arrange(desc(mortalityRate_cum)) %>%
+    dplyr::select(state) %>%
+    distinct() %>%
+    head(5)
+```
+    
+## Compute county level mortality rate and vaccine rate
+
+```{r}
+# summarize data to county level and filter by date and top 5 state
+# Note: mortality rate = death / occupied bed
+# Note: accupancyRate = occupied_bed / total_bed
+nurse_county = nurse_df %>%
+    drop_na(state, county)  %>%
+    filter(date >= "2021-06-30") %>%
+    filter(state %in% nurse_state_cum_top5_list$state) %>%
+    group_by(date, state, county) %>%
+    mutate(nurse_shortage = dplyr::case_when(nurse_shortage == "Y" ~ 1,
+                                             nurse_shortage == "N" ~ 0))  %>%
+    summarize(deaths = sum(deaths, na.rm = TRUE),
+              occupied_bed = sum(occupied_bed, na.rm = TRUE),
+              nurse_shortage = mean(nurse_shortage, na.rm = TRUE),
+              total_bed = sum(total_bed, na.rm = TRUE),
+              resident_vaccineRate = mean(resident_vaccineRate, na.rm = TRUE),
+              personnel_vaccineRate = mean(personnel_vaccineRate, na.rm = TRUE),
+              resident_vaccineRate_boost = mean(resident_vaccineRate_boost, na.rm = TRUE),
+              personnel_vaccineRate_boost = mean(personnel_vaccineRate_boost, na.rm = TRUE))%>% 
+    ungroup() %>%
+    mutate(mortalityRate = (deaths / occupied_bed) * 100,
+           occupancyRate = (occupied_bed / total_bed) * 100,
+           state_abb = state2abbr(state),
+           occupancyRate = if_else(occupancyRate < 100, occupancyRate, NULL)) %>%
+    drop_na(mortalityRate) %>%
+    mutate(mortalityRate = ifelse(mortalityRate == Inf, NA, mortalityRate))
+```
+
+\newpage
+
+## Linear models for mortalityRate VS nurse_shortage
+
+```{r}
+fit = lm(mortalityRate ~ nurse_shortage,
+         data = nurse_county)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_nurse_shortage = ggplot(data = nurse_county,
+                                aes(y = mortalityRate,
+                                    x = nurse_shortage)) +
+  labs(title = "mortalityRate VS nurse_shortage") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_nurse_shortage 
+
+```
+   
+\newpage   
+   
+## Linear models for mortalityRate VS resident_vaccineRate
+
+```{r}
+fit = lm(mortalityRate ~ resident_vaccineRate,
+         data = nurse_county)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_resident_vaccineRate = ggplot(data = nurse_county,
+                                aes(y = mortalityRate,
+                                    x = resident_vaccineRate)) +
+  labs(title = "mortalityRate VS resident_vaccineRate") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_resident_vaccineRate
+```
+\newpage
+
+## Linear models for mortalityRate VS personnel_vaccineRate
+
+```{r}
+fit = lm(mortalityRate ~ personnel_vaccineRate,
+         data = nurse_county)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_personnel_vaccineRate = ggplot(data = nurse_county,
+                                aes(y = mortalityRate,
+                                    x = personnel_vaccineRate)) +
+  labs(title = "mortalityRate VS personnel_vaccineRate") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_personnel_vaccineRate 
+```
+\newpage
+
+## Linear models for mortalityRate VS resident_vaccineRate_boost
+
+```{r}
+fit = lm(mortalityRate ~ resident_vaccineRate_boost,
+         data = nurse_county)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_resident_vaccineRate_boost = ggplot(data = nurse_county,
+                                aes(y = mortalityRate,
+                                    x = resident_vaccineRate_boost)) +
+  labs(title = "mortalityRate VS resident_vaccineRate_boost") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_resident_vaccineRate_boost 
+```
+   
+\newpage   
+    
+## Linear models for mortalityRate VS personnel_vaccineRate_boost
+
+```{r}
+fit = lm(mortalityRate ~ personnel_vaccineRate_boost,
+         data = nurse_county)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_personnel_vaccineRate_boost = ggplot(data = nurse_county,
+                                aes(y = mortalityRate,
+                                    x = personnel_vaccineRate_boost)) +
+  labs(title = "mortalityRate VS personnel_vaccineRate_boost") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_personnel_vaccineRate_boost
+``` 
+\newpage
+
+## Linear models for mortalityRate VS occupancyRate
+
+```{r}
+fit = lm(mortalityRate ~ occupancyRate,
+         data = nurse_county)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_occupancyRate = ggplot(data = nurse_county,
+                                aes(y = mortalityRate,
+                                    x = occupancyRate)) +
+  labs(title = "mortalityRate VS occupancyRate") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_occupancyRate
+```   
+
+
+\newpage   
+    
+## Time series of the nurse_shortage
+```{r}
+fig_time_series_county_nurse_shortage = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = nurse_shortage))  +
+  labs(title = "nurse_shortage in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+ggsave("Result/fig_time_series_county_nurse_shortage.jpg",
+       fig_time_series_county_nurse_shortage,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+
+\newpage   
+    
+## Time series of the resident_vaccineRate
+```{r}
+fig_time_series_county_resident_vaccineRate = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = resident_vaccineRate))  +
+  labs(title = "resident_vaccineRate in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_resident_vaccineRate
+ggsave("Result/fig_time_series_county_resident_vaccineRate.jpg",
+       fig_time_series_county_resident_vaccineRate,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+
+\newpage   
+    
+## Time series of the personnel_vaccineRate
+```{r}
+fig_time_series_county_personnel_vaccineRate = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = personnel_vaccineRate))  +
+  labs(title = "personnel_vaccineRate in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_personnel_vaccineRate
+ggsave("Result/fig_time_series_county_personnel_vaccineRate.jpg",
+       fig_time_series_county_personnel_vaccineRate,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+
+
+\newpage   
+    
+## Time series of the resident_vaccineRate_boost
+```{r}
+fig_time_series_county_resident_vaccineRate_boost = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = resident_vaccineRate_boost))  +
+  labs(title = "resident_vaccineRate_boost in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_resident_vaccineRate_boost
+ggsave("Result/fig_time_series_county_resident_vaccineRate_boost.jpg",
+       fig_time_series_county_resident_vaccineRate_boost,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+
+\newpage   
+    
+## Time series of the personnel_vaccineRate_boost
+```{r}
+fig_time_series_county_personnel_vaccineRate_boost = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = personnel_vaccineRate_boost))  +
+  labs(title = "personnel_vaccineRate_boost in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_personnel_vaccineRate_boost
+ggsave("Result/fig_time_series_county_personnel_vaccineRate_boost.jpg",
+       fig_time_series_county_personnel_vaccineRate_boost,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+\newpage   
+    
+## Time series of the occupancyRate
+```{r}
+fig_time_series_county_occupancyRate = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = occupancyRate))  +
+  labs(title = "occupancyRate in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_occupancyRate
+ggsave("Result/fig_time_series_county_occupancyRate.jpg",
+       fig_time_series_county_occupancyRate,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+
+\newpage   
+    
+## Time series of the mortalityRate
+```{r}
+fig_time_series_county_mortalityRate = ggplot(data = nurse_county,
+                         aes(x = date,
+                             y = mortalityRate))  +
+  labs(title = "mortalityRate in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_mortalityRate
+ggsave("Result/fig_time_series_county_mortalityRate.jpg",
+       fig_time_series_county_mortalityRate,
+       height=4,
+       width=8,
+       scale=1.65)
+
+```
+
+
+
