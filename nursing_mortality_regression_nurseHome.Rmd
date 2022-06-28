@@ -1,0 +1,375 @@
+---
+title: "Covid-19 Nursing home Mortality rate nursing home level"
+author: "Sina Mokhtar"
+date: '2022-06-21'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r include = FALSE}
+## load libraries
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(usdata)
+library(ggcorrplot)
+```
+
+
+
+```{r include = FALSE}
+## load nursery home datasets
+load( "Data/nurse_df.csv")
+```
+
+
+
+```{r include = FALSE}
+## Top 5 state with cumulative mortality rate
+
+# summerize data to state level and filter top 5 state with cumulative mortality rate
+# (after "2021-06-30")
+# Note: mortality rate = death / occupied bed
+nurse_state_cum_top5_list = nurse_df %>%
+    drop_na(state) %>%
+    group_by(date, state) %>%
+    summarize(deaths = sum(deaths, na.rm = TRUE),
+              occupied_bed = sum(occupied_bed, na.rm = TRUE)) %>%
+    mutate(mortalityRate = (deaths / occupied_bed) ) %>%
+    mutate(state_ab = state2abbr(state)) %>%
+    dplyr::filter(date >= "2021-06-30") %>%
+    group_by(state) %>%
+    mutate(mortalityRate_cum = cumsum(mortalityRate)) %>%
+    group_by(state) %>%
+    dplyr::arrange(desc(mortalityRate_cum)) %>%
+    dplyr::select(state) %>%
+    distinct() %>%
+    head(5)
+```
+    
+
+```{r include = FALSE}
+## Compute mortality rate and vaccine rate
+
+# filter by date and top 5 state
+# Note: mortality rate = death / occupied bed
+# Note: accupancyRate = occupied_bed / total_bed
+nurse_home = nurse_df %>%
+    filter(date >= "2021-06-30") %>%
+    filter(state %in% nurse_state_cum_top5_list$state) %>%
+    mutate(nurse_shortage = dplyr::case_when(nurse_shortage == "Y" ~ 1,
+                                             nurse_shortage == "N" ~ 0))  %>%
+    mutate(mortalityRate = (deaths / occupied_bed) * 100,
+           occupancyRate = (occupied_bed / total_bed) * 100,
+           state_abb = state2abbr(state),
+           occupancyRate = if_else(occupancyRate < 100, occupancyRate, NULL)) %>%
+    drop_na(mortalityRate) %>%
+    mutate(mortalityRate = ifelse(mortalityRate == Inf, NA, mortalityRate))
+```
+
+\newpage
+
+
+## Linear models for mortalityRate VS nurse_shortage
+
+```{r echo = FALSE, warning = FALSE}
+fit = lm(mortalityRate ~ nurse_shortage,
+         data = nurse_home)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_nurse_shortage = ggplot(data = nurse_home,
+                                aes(y = mortalityRate,
+                                    x = nurse_shortage)) +
+  labs(title = "mortalityRate VS nurse_shortage") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_nurse_shortage 
+
+```
+
+
+## Time series of the nurse_shortage
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_nurse_shortage = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = nurse_shortage))  +
+  labs(title = "nurse_shortage from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_nurse_shortage
+
+```
+   
+   
+\newpage   
+   
+## Linear models for mortalityRate VS resident_vaccineRate
+
+```{r echo = FALSE, warning = FALSE}
+fit = lm(mortalityRate ~ resident_vaccineRate,
+         data = nurse_home)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_resident_vaccineRate = ggplot(data = nurse_home,
+                                aes(y = mortalityRate,
+                                    x = resident_vaccineRate)) +
+  labs(title = "mortalityRate VS resident_vaccineRate") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_resident_vaccineRate
+```
+
+## Time series of the resident_vaccineRate
+
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_resident_vaccineRate = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = resident_vaccineRate))  +
+  labs(title = "resident_vaccineRate from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_resident_vaccineRate
+```
+
+
+\newpage
+
+## Linear models for mortalityRate VS personnel_vaccineRate
+
+```{r echo = FALSE, warning = FALSE}
+fit = lm(mortalityRate ~ personnel_vaccineRate,
+         data = nurse_home)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_personnel_vaccineRate = ggplot(data = nurse_home,
+                                aes(y = mortalityRate,
+                                    x = personnel_vaccineRate)) +
+  labs(title = "mortalityRate VS personnel_vaccineRate") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_personnel_vaccineRate 
+```
+
+\newpage   
+    
+## Time series of the personnel_vaccineRate
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_personnel_vaccineRate = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = personnel_vaccineRate))  +
+  labs(title = "personnel_vaccineRate from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_personnel_vaccineRate
+
+```   
+   
+
+
+
+\newpage
+
+## Linear models for mortalityRate VS resident_vaccineRate_boost
+
+```{r echo = FALSE, warning = FALSE}
+fit = lm(mortalityRate ~ resident_vaccineRate_boost,
+         data = nurse_home)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_resident_vaccineRate_boost = ggplot(data = nurse_home,
+                                aes(y = mortalityRate,
+                                    x = resident_vaccineRate_boost)) +
+  labs(title = "mortalityRate VS resident_vaccineRate_boost") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_resident_vaccineRate_boost 
+```
+   
+   
+\newpage   
+    
+## Time series of the resident_vaccineRate_boost
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_resident_vaccineRate_boost = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = resident_vaccineRate_boost))  +
+  labs(title = "resident_vaccineRate_boost from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_resident_vaccineRate_boost
+```   
+   
+   
+
+   
+   
+\newpage   
+    
+## Linear models for mortalityRate VS personnel_vaccineRate_boost
+
+```{r echo = FALSE, warning = FALSE}
+fit = lm(mortalityRate ~ personnel_vaccineRate_boost,
+         data = nurse_home)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_personnel_vaccineRate_boost = ggplot(data = nurse_home,
+                                aes(y = mortalityRate,
+                                    x = personnel_vaccineRate_boost)) +
+  labs(title = "mortalityRate VS personnel_vaccineRate_boost") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_personnel_vaccineRate_boost
+``` 
+
+
+\newpage   
+    
+## Time series of the personnel_vaccineRate_boost
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_personnel_vaccineRate_boost = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = personnel_vaccineRate_boost))  +
+  labs(title = "personnel_vaccineRate_boost from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_personnel_vaccineRate_boost
+
+```
+
+
+
+
+\newpage
+
+## Linear models for mortalityRate VS occupancyRate
+
+```{r echo = FALSE, warning = FALSE}
+fit = lm(mortalityRate ~ occupancyRate,
+         data = nurse_home)
+
+summary(fit)
+#plot the model
+fig_mortalityRate_occupancyRate = ggplot(data = nurse_home,
+                                aes(y = mortalityRate,
+                                    x = occupancyRate)) +
+  labs(title = "mortalityRate VS occupancyRate") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_mortalityRate_occupancyRate
+```   
+
+
+\newpage   
+    
+## Time series of the occupancyRate
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_occupancyRate = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = occupancyRate))  +
+  labs(title = "occupancyRate from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_occupancyRate
+```
+
+
+\newpage   
+    
+## Time series of the mortalityRate
+```{r echo = FALSE, warning = FALSE}
+fig_time_series_county_mortalityRate = ggplot(data = nurse_home,
+                         aes(x = date,
+                             y = mortalityRate))  +
+  labs(title = "mortalityRate in county level from July 2021 ") +
+  geom_point() +
+  geom_smooth(method='lm',
+              formula= y~x,
+              se = FALSE)
+fig_time_series_county_mortalityRate
+
+
+```
+
+
+```{r}
+# Linear model
+fit_linear = lm(mortalityRate ~ nurse_shortage  + personnel_vaccineRate + resident_vaccineRate_boost  + occupancyRate, 
+         data = nurse_home)
+summary(fit_linear)
+```
+
+```{r}
+nurse_home_rNA = nurse_home %>%
+    na.omit()
+nurse_corr = cor(dplyr::select(nurse_home_rNA,
+                               nurse_shortage,
+                        resident_vaccineRate,
+                        personnel_vaccineRate, 
+                        resident_vaccineRate_boost,
+                        personnel_vaccineRate_boost,
+                        occupancyRate))
+nurse_corr_heatmap = ggcorrplot(nurse_corr,
+                                type = "lower",
+                              outline.color  = "black",
+                              ggtheme = ggplot2::theme_gray,
+                              colors = c("#6D9EC1", "white", "#E46726"),
+                              lab = TRUE,
+                              lab_size = 3)
+nurse_corr_heatmap
+```
+
+
+
+
+
+```{r}
+fit_ploy = lm(mortalityRate ~ poly(nurse_shortage  + personnel_vaccineRate + resident_vaccineRate_boost  + occupancyRate, 5, raw = TRUE), 
+         data = nurse_home)
+summary(fit_ploy)
+```
+
+
+
+
+```{r}
+"Data/SARS-CoV-2_Variant_Proportions.csv"
+```
+
+
+
