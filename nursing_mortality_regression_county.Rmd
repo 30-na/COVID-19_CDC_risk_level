@@ -1,5 +1,5 @@
 ---
-title: "Covid-19 Nursing home Mortality rate"
+title: "Covid-19 Nursing home Mortality rate county level"
 author: "Sina Mokhtar"
 date: '2022-06-21'
 output:
