@@ -34,6 +34,7 @@ names(nurse_file)
 
 nurse_df = nurse_file %>%
     dplyr::select("Week Ending",
+                  "Federal Provider Number",
            "Provider State",
            "County",
            "Passed Quality Assurance Check",
@@ -52,6 +53,7 @@ nurse_df = nurse_file %>%
            "Percentage of Current Residents with a Completed Vaccination who Received a COVID-19 Vaccine Booster at Any Time",
            "Percentage of Current Healthcare Personnel with a Completed Vaccination who Received a COVID-19 Vaccine Booster at Any Time") %>%
   rename(date = "Week Ending",
+         fedNumber = "Federal Provider Number",
          state = "Provider State",
          county = "County",
          qualityCheck = "Passed Quality Assurance Check",
@@ -76,6 +78,40 @@ nurse_df = nurse_file %>%
   mutate(state_county = tolower(state_county))
 
 save(nurse_df , file = "Data/nurse_df.csv")
+
+################
+covid_variant_file = fread("Data/SARS-CoV-2_Variant_Proportions.csv")
+
+str(covid_variant_file)
+covid_variant = covid_variant_file %>%
+    mutate(date = as.Date(week_ending, format="%m/%d/%Y"))
+    select(date,
+           )
+    dplyr::filter(usa_or_hhsregion == "USA",
+                  time_interval == "weekly") %>%
+    arrange(date, variant)
+    group_by(date) %>%
+    summarize(sum = sum(share))
+
+
+covid_variant_1 = covid_variant 
+    group_by(week_ending) %>%
+    summarize(sum = sum(share))
+
+##### Covid Variants  ####
+
+# plot the positiveRate category rate column 
+fig_usa_Variant_col = ggplot(data = covid_variant,
+                                     aes(x = date,
+                                         y = share,
+                                         fill = variant)) +
+    geom_col()+
+    labs(title = "SARS-CoV-2 variants",
+         y = "The proportion of the variant")+
+    scale_fill_viridis_d()
+ggsave("Result/usa_Variant_col.jpg",
+       fig_usa_Variant_col,
+       height=4,width=8,scale=1.65)
 
 
 ##### map of county with available data #############
